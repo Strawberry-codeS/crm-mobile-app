@@ -1,0 +1,5 @@
+{
+  "name": "CRM Mobile App",
+  "description": "A mobile-first CRM application for education sales management, featuring customer tracking, task management, and communication tools.",
+  "requestFramePermissions": []
+}
