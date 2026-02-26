@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL as string;
+const supabaseAnonKey = (import.meta as any).env.VITE_SUPABASE_ANON_KEY as string;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
@@ -49,6 +49,9 @@ export interface Customer {
     time_status: 'urgent' | 'warning' | 'success' | null;
     focus_dimensions: string[] | null;
     custom_tags: string[] | null;
+    first_response_deadline_at: string | null;
+    follow_up_period_days: number | null;
+    min_follow_ups_required: number | null;
     color: string | null;
     created_at: string;
     updated_at: string;

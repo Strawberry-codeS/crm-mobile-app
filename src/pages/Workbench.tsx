@@ -1,17 +1,20 @@
 ﻿import { Bell, Phone, MessageSquare, Search, Filter, Menu, X, MapPin, ChevronDown } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
+import { useCustomers } from '@/hooks/useCustomers';
 
 // ─── 数据类型 ───────────────────────────────────────────────────────────────
-interface CustomerData {
+export interface CustomerData {
+    id?: string;
     name: string;
     /** 第一个标签显示为纯色背景(红/橙/绿)白字，后续为渠道标签 */
     tags: string[];
     /** 卡片左边框及时钟颜色: red / orange / green */
     color: 'red' | 'orange' | 'green';
-    /** 时钟提示文字 */
+    /** 时钟提示文字（如果有截止期限，此项将回退作为默认兜底） */
     timeText: string;
     /** 时钟状态: urgent红 / warning橙 / success绿 */
     timeStatus: 'urgent' | 'warning' | 'success';
@@ -19,6 +22,10 @@ interface CustomerData {
     task: string;
     /** 底部 | 分隔的信息标签 */
     info: string;
+
+    first_response_deadline_at?: string | null;
+    follow_up_period_days?: number | null;
+    min_follow_ups_required?: number | null;
 }
 
 // ─── 每个 Tab 的数据 ─────────────────────────────────────────────────────────
@@ -167,7 +174,7 @@ export default function Workbench() {
         setActiveTags(activeTags.filter((t) => t !== tag));
     };
 
-    const customers = tabData[activeTab] ?? [];
+    const { customers, loading: customersLoading } = useCustomers(activeTab);
 
     return (
         <div className="min-h-screen bg-[#F5F6FA] p-4 space-y-5 pb-24 relative overflow-x-hidden">
@@ -295,12 +302,36 @@ export default function Workbench() {
                     transition={{ duration: 0.2 }}
                     className="space-y-4 pb-4"
                 >
-                    {customers.map((customer, index) => (
-                        <CustomerCard key={index} {...customer} />
-                    ))}
-                    {customers.length === 0 && (
-                        <div className="text-center text-gray-400 text-sm py-16">暂无客户数据</div>
+                    {customersLoading && (
+                        <div className="text-center py-10 text-gray-400 text-sm animate-pulse">加载中...</div>
                     )}
+                    {!customersLoading && customers.length === 0 && (
+                        <div className="text-center py-10 text-gray-400 text-sm">暂无客户数据</div>
+                    )}
+                    {!customersLoading && customers.map((customer, index) => {
+                        const { id, ...rest } = customer as any;
+                        const cardTags = [];
+                        if (rest.source_channel) cardTags.push(rest.source_channel);
+                        if (rest.custom_tags && Array.isArray(rest.custom_tags)) cardTags.push(...rest.custom_tags);
+
+                        return (
+                            <div key={id || `customer-${index}`}>
+                                <CustomerCard
+                                    id={id}
+                                    name={rest.name}
+                                    tags={cardTags}
+                                    color={rest.color || 'red'}
+                                    timeText={rest.time_text || ''}
+                                    timeStatus={rest.time_status || 'urgent'}
+                                    task={rest.customer_stage ? `当前任务: ${rest.customer_stage}` : '当前任务: 跟进'}
+                                    info={[rest.product_line, rest.is_key_deal ? '重点单' : '常规单', rest.customer_level ? `${rest.customer_level}类客户` : '', rest.customer_stage].filter(Boolean).join(' | ')}
+                                    first_response_deadline_at={rest.first_response_deadline_at}
+                                    follow_up_period_days={rest.follow_up_period_days}
+                                    min_follow_ups_required={rest.min_follow_ups_required}
+                                />
+                            </div>
+                        );
+                    })}
                 </motion.div>
             </AnimatePresence>
 
@@ -313,8 +344,59 @@ export default function Workbench() {
 }
 
 // ─── 客户卡片 ─────────────────────────────────────────────────────────────────
-function CustomerCard({ name, tags, color, timeText, timeStatus, task, info }: CustomerData) {
+function CustomerCard({ id, name, tags, color, timeText, timeStatus, task, info, first_response_deadline_at, follow_up_period_days, min_follow_ups_required }: CustomerData) {
     const navigate = useNavigate();
+
+    /* 倒计时逻辑 */
+    const [timeLeft, setTimeLeft] = useState<string>('');
+    const [isTimeout, setIsTimeout] = useState(false);
+
+    useEffect(() => {
+        if (timeText) {
+            setTimeLeft(timeText);
+            setIsTimeout(false);
+            return;
+        }
+
+        if (!first_response_deadline_at) {
+            setTimeLeft('今天跟进');
+            setIsTimeout(false);
+            return;
+        }
+
+        const tick = () => {
+            const now = new Date().getTime();
+            const deadline = new Date(first_response_deadline_at).getTime();
+            const diff = deadline - now;
+
+            if (diff <= 0) {
+                setTimeLeft('已超时');
+                setIsTimeout(true);
+            } else {
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+                if (hours > 0) {
+                    setTimeLeft(`首次: ${hours}h ${mins < 10 ? '0' : ''}${mins}m后超时`);
+                } else {
+                    setTimeLeft(`首次: ${mins}:${secs < 10 ? '0' : ''}${secs}后超时`);
+                }
+                setIsTimeout(false);
+            }
+        };
+
+        tick();
+        const interval = setInterval(tick, 1000);
+        return () => clearInterval(interval);
+    }, [first_response_deadline_at, timeText]);
+
+    /* 生成智能标签列表 */
+    const computedTags: { text: string; isUrgentBadge: boolean }[] = [];
+    if (follow_up_period_days && min_follow_ups_required) {
+        computedTags.push({ text: `${follow_up_period_days}天待跟进${min_follow_ups_required}次`, isUrgentBadge: true });
+    }
+    tags.forEach(t => computedTags.push({ text: t, isUrgentBadge: false }));
 
     /* 左边框颜色 */
     const borderClass = {
@@ -324,53 +406,47 @@ function CustomerCard({ name, tags, color, timeText, timeStatus, task, info }: C
     }[color];
 
     /* 时钟颜色 */
+    const activeTimeStatus = isTimeout ? 'urgent' : timeStatus;
     const clockFill = {
         urgent: '#FCA5A5',
         warning: '#FDBA74',
         success: '#6EE7B7',
-    }[timeStatus];
+    }[activeTimeStatus];
 
     const timeColorClass = {
         urgent: 'text-red-500',
         warning: 'text-orange-500',
         success: 'text-emerald-500',
-    }[timeStatus];
-
-    /* 第一个 tag 的背景色 (红/橙/绿) */
-    const firstTagBg = {
-        red: 'bg-red-500 text-white',
-        orange: 'bg-orange-400 text-white',
-        green: 'bg-emerald-500 text-white',
-    }[color];
+    }[activeTimeStatus];
 
     return (
         <Link
-            to="/customers/1"
+            to={`/customers/${id || 1}`}
             className={`block bg-white rounded-3xl p-5 shadow-sm relative overflow-hidden ${borderClass}`}
         >
             {/* 顶部: 姓名 + 标签 + 时钟 */}
             <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center flex-nowrap gap-2 min-w-0 overflow-hidden">
                     <h3 className="font-bold text-lg text-gray-900 whitespace-nowrap shrink-0">{name}</h3>
-                    {tags.map((tag, i) => (
+                    {computedTags.map((tag, i) => (
                         <span
                             key={i}
                             className={cn(
                                 'text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0',
-                                i === 0
-                                    ? firstTagBg
-                                    : tag.includes('小红书')
+                                tag.isUrgentBadge
+                                    ? 'bg-red-500 text-white'
+                                    : tag.text.includes('小红书')
                                         ? 'bg-red-100 text-red-600'
-                                        : tag.includes('抖音')
+                                        : tag.text.includes('抖音')
                                             ? 'bg-violet-100 text-violet-600'
-                                            : tag.includes('演示')
+                                            : tag.text.includes('演示') || tag.text.includes('试听')
                                                 ? 'bg-purple-100 text-purple-600'
-                                                : tag.includes('线下') || tag.includes('地推')
+                                                : tag.text.includes('线下') || tag.text.includes('地推')
                                                     ? 'bg-blue-100 text-blue-600'
                                                     : 'bg-gray-100 text-gray-600',
                             )}
                         >
-                            {tag}
+                            {tag.text}
                         </span>
                     ))}
                 </div>
@@ -378,7 +454,7 @@ function CustomerCard({ name, tags, color, timeText, timeStatus, task, info }: C
                 {/* 时钟图标 + 提示文字 */}
                 <div className={cn('flex items-center text-xs font-medium shrink-0 ml-2', timeColorClass)}>
                     <ClockIcon fill={clockFill} className="mr-1" />
-                    {timeText}
+                    {timeLeft}
                 </div>
             </div>
 
@@ -633,6 +709,7 @@ function FilterChip({
     children: React.ReactNode;
     active: boolean;
     onClick: () => void;
+    key?: string;
 }) {
     return (
         <button

@@ -48,6 +48,9 @@ create table if not exists customers (
   tab_category text,
   time_text text,
   time_status text check (time_status in ('urgent','warning','success')),
+  first_response_deadline_at timestamptz,
+  follow_up_period_days int,
+  min_follow_ups_required int,
   focus_dimensions text[],
   custom_tags text[],
   color text,
@@ -155,12 +158,13 @@ create policy "Anon read demos" on demo_sessions for all using (true);
 -- 创建一个测试账号对应的 profile（在 supabase auth 创建账号后，手动关联）
 -- 先插入客户数据（不关联 assigned_to）
 
-insert into customers (name, phone, customer_level, is_key_deal, product_line, source_channel, intended_campus, customer_stage, tab_category, time_text, time_status, color, pipeline_stage, last_status_change_at) values
-  ('欧阳春晓', '138-8888-0001', 'A', false, '瑞思英语', '线上-抖音表单', '大悦城校区', '承诺上门', '新分配客户', '首次：15:00后超时', 'urgent', 'red', '邀约demo', now() - interval '1 day'),
-  ('欧阳小明', '138-8888-0002', 'B', false, '瑞思英语', '线下-口碑', '朝阳校区', '未承诺', '新分配客户', '首次：30:00后超时', 'success', 'green', '接触阶段', now() - interval '2 days'),
-  ('陈杰森', '166-0368-1154', 'A', true, '瑞思英语', '线上营销-美团-抖音', '大悦城校区', '已上门未缴费', '重点客户', '今日22:00跟进', 'urgent', 'red', '邀约demo', now() - interval '3 days'),
-  ('王小红', '139-0000-0001', 'B', false, '瑞思玛特', '线上-小红书', '三里屯校区', '承诺上门', '待继续跟进', '明日10:00跟进', 'warning', 'blue', '接触阶段', now() - interval '4 days'),
-  ('李明明', '139-0000-0002', 'C', false, '瑞思英语', '线下-地推', '朝阳校区', '未承诺', '待上门试听', '今日14:00试听', 'urgent', 'orange', '已到访', now() - interval '5 days')
+insert into customers (name, phone, customer_level, is_key_deal, product_line, source_channel, intended_campus, customer_stage, tab_category, time_text, time_status, color, pipeline_stage, last_status_change_at, first_response_deadline_at, follow_up_period_days, min_follow_ups_required) values
+  ('欧阳春晓', '138-8888-0001', 'A', false, '瑞思英语', '线上-抖音表单', '大悦城校区', '承诺上门', '新分配客户', '首次：15:00后超时', 'urgent', 'red', '邀约demo', now() - interval '1 day', now() + interval '15 minutes', 3, 2),
+  ('王梓轩', '138-8888-0003', 'A', false, '瑞思英语', '线上-抖音-活动', '大悦城校区', '未承诺', '新分配客户', '首次：25:00后超时', 'warning', 'orange', '邀约demo', now() - interval '1 day', now() + interval '25 minutes', 3, 2),
+  ('欧阳小明', '138-8888-0002', 'B', false, '瑞思英语', '线下-口碑', '朝阳校区', '未承诺', '新分配客户', '首次：30:00后超时', 'success', 'green', '接触阶段', now() - interval '2 days', now() + interval '30 minutes', 3, 2),
+  ('陈杰森', '166-0368-1154', 'A', true, '瑞思英语', '线上营销-美团-抖音', '大悦城校区', '已上门未缴费', '重点客户', '今日22:00跟进', 'urgent', 'red', '邀约demo', now() - interval '3 days', null, 2, 1),
+  ('王小红', '139-0000-0001', 'B', false, '瑞思玛特', '线上-小红书', '三里屯校区', '承诺上门', '待继续跟进', '明日10:00跟进', 'warning', 'blue', '接触阶段', now() - interval '4 days', null, 3, 2),
+  ('李明明', '139-0000-0002', 'C', false, '瑞思英语', '线下-地推', '朝阳校区', '未承诺', '待上门试听', '今日14:00试听', 'urgent', 'orange', '已到访', now() - interval '5 days', null, 2, 1)
 on conflict do nothing;
 
 -- 插入学员数据

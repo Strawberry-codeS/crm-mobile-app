@@ -1,6 +1,6 @@
 ﻿import { Bell, Calendar as CalendarIcon, Phone, MessageSquare, Search, Filter, Menu, X, ChevronLeft, ChevronRight, ChevronDown, Info, Calendar, MapPin } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCustomers } from '@/hooks/useCustomers';
@@ -10,6 +10,7 @@ import type { Customer as CustomerData } from '@/lib/supabase';
 function buildTags(c: CustomerData): string[] {
   const tags: string[] = [];
   if (c.source_channel) tags.push(c.source_channel);
+  if (c.custom_tags && Array.isArray(c.custom_tags)) tags.push(...c.custom_tags);
   return tags.filter(Boolean);
 }
 
@@ -485,6 +486,9 @@ export default function Dashboard() {
               timeStatus={(c.time_status as 'urgent' | 'warning' | 'success') ?? 'urgent'}
               task={c.customer_stage ? `当前任务: ${c.customer_stage}` : '当前任务: 跟进'}
               info={buildInfo(c)}
+              first_response_deadline_at={c.first_response_deadline_at}
+              follow_up_period_days={c.follow_up_period_days}
+              min_follow_ups_required={c.min_follow_ups_required}
             />
           ))}
         </motion.div>
@@ -952,11 +956,64 @@ const borderMap = { red: 'border-l-[6px] border-red-400', orange: 'border-l-[6px
 const clockFillMap = { urgent: '#FCA5A5', warning: '#FDBA74', success: '#6EE7B7' };
 const timeColorMap = { urgent: 'text-red-500', warning: 'text-orange-500', success: 'text-emerald-500' };
 
-function TaskCard({ id, name, tags, color = 'red', timeText, timeStatus = 'urgent', task, info }: any) {
+function TaskCard({ id, name, tags, color = 'red', timeText, timeStatus = 'urgent', task, info, first_response_deadline_at, follow_up_period_days, min_follow_ups_required }: any) {
   const navigate = useNavigate();
+
+  const [timeLeft, setTimeLeft] = useState<string>('');
+  const [isTimeout, setIsTimeout] = useState(false);
+
+  useEffect(() => {
+    if (timeText) {
+      setTimeLeft(timeText);
+      setIsTimeout(false);
+      return;
+    }
+
+    if (!first_response_deadline_at) {
+      setTimeLeft('今天跟进');
+      setIsTimeout(false);
+      return;
+    }
+
+    const tick = () => {
+      const now = new Date().getTime();
+      const deadline = new Date(first_response_deadline_at).getTime();
+      const diff = deadline - now;
+
+      if (diff <= 0) {
+        setTimeLeft('已超时');
+        setIsTimeout(true);
+      } else {
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+        if (hours > 0) {
+          setTimeLeft(`首次: ${hours}h ${mins < 10 ? '0' : ''}${mins}m后超时`);
+        } else {
+          setTimeLeft(`首次: ${mins}:${secs < 10 ? '0' : ''}${secs}后超时`);
+        }
+        setIsTimeout(false);
+      }
+    };
+
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [first_response_deadline_at, timeText]);
+
+  /* 生成智能标签列表 */
+  const computedTags: { text: string; isUrgentBadge: boolean }[] = [];
+  if (follow_up_period_days && min_follow_ups_required) {
+    computedTags.push({ text: `${follow_up_period_days}天待跟进${min_follow_ups_required}次`, isUrgentBadge: true });
+  }
+  (tags as string[]).forEach(t => computedTags.push({ text: t, isUrgentBadge: false }));
+
   const borderClass = borderMap[color as keyof typeof borderMap] ?? borderMap.red;
-  const clockFill = clockFillMap[timeStatus as keyof typeof clockFillMap] ?? clockFillMap.urgent;
-  const timeColorClass = timeColorMap[timeStatus as keyof typeof timeColorMap] ?? timeColorMap.urgent;
+
+  const activeTimeStatus = isTimeout ? 'urgent' : timeStatus;
+  const clockFill = clockFillMap[activeTimeStatus as keyof typeof clockFillMap] ?? clockFillMap.urgent;
+  const timeColorClass = timeColorMap[activeTimeStatus as keyof typeof timeColorMap] ?? timeColorMap.urgent;
 
   return (
     <Link to={`/customers/${id}`} className={`block bg-white rounded-3xl p-5 shadow-sm relative overflow-hidden ${borderClass}`}>
@@ -964,28 +1021,28 @@ function TaskCard({ id, name, tags, color = 'red', timeText, timeStatus = 'urgen
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center flex-nowrap gap-2 min-w-0 overflow-hidden">
           <h3 className="font-bold text-lg text-gray-900 whitespace-nowrap shrink-0">{name}</h3>
-          {(tags as string[]).map((tag, i) => (
+          {computedTags.map((tag, i) => (
             <span
               key={i}
               className={cn(
                 'text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0',
-                i === 0
+                tag.isUrgentBadge
                   ? 'bg-red-500 text-white'
-                  : tag.includes('小红书') ? 'bg-red-100 text-red-600'
-                    : tag.includes('抖音') ? 'bg-violet-100 text-violet-600'
-                      : tag.includes('试听') ? 'bg-purple-100 text-purple-600'
-                        : tag.includes('线下') || tag.includes('地推') ? 'bg-blue-100 text-blue-600'
+                  : tag.text.includes('小红书') ? 'bg-red-100 text-red-600'
+                    : tag.text.includes('抖音') ? 'bg-violet-100 text-violet-600'
+                      : tag.text.includes('试听') ? 'bg-purple-100 text-purple-600'
+                        : tag.text.includes('线下') || tag.text.includes('地推') ? 'bg-blue-100 text-blue-600'
                           : 'bg-gray-100 text-gray-600'
               )}
             >
-              {tag}
+              {tag.text}
             </span>
           ))}
         </div>
         {/* 时钟图标 + 超时提示文字 */}
         <div className={cn('flex items-center text-xs font-medium shrink-0 ml-2', timeColorClass)}>
           <ClockIcon fill={clockFill} className="mr-1" />
-          {timeText}
+          {timeLeft}
         </div>
       </div>
 
