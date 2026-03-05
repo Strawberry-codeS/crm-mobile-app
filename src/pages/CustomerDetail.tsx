@@ -92,20 +92,27 @@ export default function CustomerDetail() {
             </button>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-gray-50">
-            <div>
-              <div className="flex items-center text-xs text-gray-400 mb-1">
-                产品线 <HelpCircle size={10} className="ml-1" />
+          <div className="flex justify-between items-start mt-6 pt-4 border-t border-gray-50 gap-2">
+            <div className="flex-[1.2] min-w-0">
+              <div className="flex items-center text-[10px] text-gray-400 mb-1">
+                产品线 <HelpCircle size={10} className="ml-1 shrink-0" />
               </div>
-              <div className="text-sm font-medium text-gray-800">瑞思英语 <ChevronDownIcon /></div>
+              <div className="text-xs font-medium text-gray-800 flex items-center">
+                <span className="truncate">瑞思英语</span>
+                <ChevronDownIcon className="ml-0.5 shrink-0" size={14} />
+              </div>
             </div>
-            <div>
-              <div className="text-xs text-gray-400 mb-1">渠道来源</div>
-              <div className="text-sm font-medium text-gray-800">线上营销-美团-抖音</div>
+            <div className="flex-[1.5] min-w-0">
+              <div className="text-[10px] text-gray-400 mb-1">渠道来源</div>
+              <div className="text-xs font-medium text-gray-800 truncate">线上营销-美团-抖音</div>
             </div>
-            <div className="text-right">
-              <div className="text-xs text-gray-400 mb-1">意向校区</div>
-              <div className="text-sm font-medium text-gray-800">大悦城校区</div>
+            <div className="flex-1 min-w-0 text-center">
+              <div className="text-[10px] text-gray-400 mb-1">意向校区</div>
+              <div className="text-xs font-medium text-gray-800 truncate">大悦城校区</div>
+            </div>
+            <div className="flex-1 min-w-0 text-right">
+              <div className="text-[10px] text-gray-400 mb-1">推荐人</div>
+              <div className="text-xs font-medium text-gray-800 truncate">崔海燕</div>
             </div>
           </div>
         </div>
