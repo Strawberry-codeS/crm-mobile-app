@@ -1,4 +1,4 @@
-import { ChevronLeft, Edit2, Copy, Plus, HelpCircle, Phone, MessageSquare, Users, CheckCircle, Clock, Calendar, ShoppingBag, ShoppingCart } from 'lucide-react';
+import { ChevronLeft, Edit2, Copy, Plus, HelpCircle, Phone, MessageSquare, Users, CheckCircle, Clock, Calendar, ShoppingBag, ShoppingCart, ChevronDown, ChevronUp, FileText } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -37,30 +37,8 @@ export default function CustomerDetail() {
       </div>
 
       <div className="p-4 space-y-4">
-        {/* Family Bar: dynamic based on students from Supabase */}
+        {/* Family Bar: only show 新增学员 button */}
         <div className="flex space-x-3 overflow-x-auto no-scrollbar pb-2">
-          {students.map((student, idx) => (
-            <button
-              key={student.id}
-              onClick={() => setActiveStudentIndex(idx)}
-              className={cn(
-                "flex items-center rounded-full pl-1 pr-4 py-1 min-w-fit transition-all",
-                activeStudentIndex === idx
-                  ? "bg-white border border-violet-200 shadow-sm"
-                  : "bg-gray-100 border border-transparent opacity-60"
-              )}
-            >
-              <img
-                src={student.avatar_url ?? `https://picsum.photos/seed/${student.id}/40/40`}
-                className={cn("w-8 h-8 rounded-full mr-2 object-cover", activeStudentIndex !== idx && 'grayscale')}
-                alt="Avatar"
-              />
-              <span className={cn("text-sm font-bold text-gray-800", activeStudentIndex !== idx && 'font-medium text-gray-600')}>
-                {student.name}
-              </span>
-              {!student.is_primary && <span className="ml-2 text-[10px] bg-gray-200 px-1 rounded">小孩</span>}
-            </button>
-          ))}
           <button
             onClick={() => navigate('edit', { state: { newStudent: true } })}
             className="flex items-center justify-center border border-dashed border-gray-300 rounded-full px-3 py-1 text-xs text-gray-500 min-w-fit bg-white/50"
@@ -99,10 +77,10 @@ export default function CustomerDetail() {
                     <Plus size={10} />
                   </button>
                 </div>
-                <div className="flex gap-2">
-                  <span className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded">{profile.age}</span>
-                  <span className="text-xs bg-violet-50 text-violet-600 px-2 py-1 rounded">优惠价格</span>
-                  <span className="text-xs bg-violet-50 text-violet-600 px-2 py-1 rounded">服务策略</span>
+                <div className="flex gap-2 flex-wrap">
+                  {profile.age && <span className="text-sm bg-blue-50 text-blue-600 px-3 py-1 rounded">{profile.age}</span>}
+                  <span className="text-sm bg-violet-50 text-violet-600 px-3 py-1 rounded">优惠价格</span>
+                  <span className="text-sm bg-violet-50 text-violet-600 px-3 py-1 rounded">服务策略</span>
                 </div>
               </div>
             </div>
@@ -170,25 +148,25 @@ export default function CustomerDetail() {
             <span className="text-sm text-gray-600">已邀约<span className="text-violet-600 font-bold">2月6日下午4点</span>的瑞思demo-p</span>
           </div>
 
-          <div className="bg-orange-50 border border-orange-100 rounded-lg p-3 flex items-start gap-2">
-            <HelpCircle className="text-orange-500 mt-0.5" size={16} />
-            <span className="text-xs text-gray-600">最近用户 <span className="text-orange-500 font-bold">5天</span> 未有状态变更， 建议早日跟进</span>
-          </div>
+          <PriorityCard />
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-4 gap-3">
           <button
             onClick={() => navigate('add-note', { state: { isCall: true } })}
-            className="flex items-center justify-center gap-2 bg-violet-100 text-violet-700 py-3 rounded-xl font-bold hover:bg-violet-200 transition"
+            className="flex items-center justify-center gap-1.5 bg-violet-100 text-violet-700 py-3 rounded-xl font-bold hover:bg-violet-200 transition text-sm"
           >
-            <Phone size={18} /> 电话
+            <Phone size={16} /> 电话
           </button>
-          <button className="flex items-center justify-center gap-2 bg-violet-100 text-violet-700 py-3 rounded-xl font-bold hover:bg-violet-200 transition">
-            <MessageSquare size={18} /> 单聊
+          <button className="flex items-center justify-center gap-1.5 bg-violet-100 text-violet-700 py-3 rounded-xl font-bold hover:bg-violet-200 transition text-sm">
+            <MessageSquare size={16} /> 单聊
           </button>
-          <button className="flex items-center justify-center gap-2 bg-violet-100 text-violet-700 py-3 rounded-xl font-bold hover:bg-violet-200 transition">
-            <Users size={18} /> 群聊
+          <button className="flex items-center justify-center gap-1.5 bg-violet-100 text-violet-700 py-3 rounded-xl font-bold hover:bg-violet-200 transition text-sm">
+            <Users size={16} /> 群聊
+          </button>
+          <button className="flex items-center justify-center gap-1.5 bg-violet-100 text-violet-700 py-3 rounded-xl font-bold hover:bg-violet-200 transition text-sm">
+            <FileText size={16} /> 建合同
           </button>
         </div>
 
@@ -540,6 +518,72 @@ function Tag({ children, active }: any) {
     )}>
       {children}
     </span>
+  );
+}
+
+function PriorityCard() {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="rounded-xl border border-orange-100 bg-orange-50 overflow-hidden select-none">
+      {/* Content area with left icon */}
+      <div className="flex gap-2.5 px-3 pt-3">
+        {/* Left orange question mark icon */}
+        <div className="flex-shrink-0 mt-0.5">
+          <HelpCircle className="text-orange-400" size={20} />
+        </div>
+
+        {/* Text rows */}
+        <div className="flex-1 min-w-0">
+          <p className={`text-xs leading-5 ${expanded ? 'text-gray-600' : 'truncate text-gray-600'}`}>
+            <span className="font-bold">【重点理由】</span>刚才在直播间购买了体验课，之前还看了两条课程视频，停在价格页超过3分钟。25分钟前刚发生。
+          </p>
+          <p className={`text-xs leading-5 mt-0.5 ${expanded ? 'text-gray-600' : 'truncate text-gray-600'}`}>
+            <span className="font-bold">【客户关注】</span>体验课怎么上 · 价格是否划算 · 上课地点方不方便
+          </p>
+
+          {/* 3rd row with bottom-up gradient fade when collapsed */}
+          <div className="relative mt-0.5">
+            <p className={`text-xs leading-5 text-gray-600 overflow-hidden ${!expanded ? 'truncate' : ''}`}>
+              <span className="font-bold">【建议开场】</span>「您好，我是瑞思的老师，看到您刚预约了体验课，想帮您确认一下上课时间——您方便说一下孩子几岁，这边给您安排最合适的班级。」
+            </p>
+            {/* Strong bottom-up gradient fade when collapsed */}
+            {!expanded && (
+              <div
+                className="absolute inset-x-0 bottom-0 h-5 pointer-events-none"
+                style={{ background: 'linear-gradient(to bottom, transparent, #FFF7ED)' }}
+              />
+            )}
+          </div>
+
+          {/* Extra content shown only when expanded */}
+          {expanded && (
+            <div className="mt-2 space-y-1.5">
+              <div className="border-t border-orange-100 pt-1.5">
+                <p className="text-xs text-gray-600 leading-5">
+                  <span className="font-bold text-orange-600">【注意】</span>她在意性价比，先别推年课，让她把体验课上了再说。
+                </p>
+              </div>
+              <div className="bg-white/70 rounded-lg p-2 border border-orange-100">
+                <p className="text-[11px] text-gray-500 leading-relaxed">
+                  📍 首联时补问：「孩子在哪所幼儿园/小学呢？我看看离哪个校区最近」——补录后系统自动更新等级。
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Bottom center chevron toggle button */}
+      <div className="flex justify-center pb-2 pt-1.5">
+        <button
+          onClick={() => setExpanded(v => !v)}
+          className="flex items-center justify-center w-6 h-6 rounded-full bg-white/80 border border-orange-100 text-gray-400 hover:bg-white transition-colors"
+        >
+          {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+        </button>
+      </div>
+    </div>
   );
 }
 

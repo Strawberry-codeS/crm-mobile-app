@@ -20,6 +20,8 @@ export interface CustomerData {
     timeStatus: 'urgent' | 'warning' | 'success';
     /** 任务描述 */
     task: string;
+    /** 任务详情（展开显示） */
+    taskDetail?: string;
     /** 底部 | 分隔的信息标签 */
     info: string;
 
@@ -37,7 +39,8 @@ const tabData: Record<string, CustomerData[]> = {
             color: 'red',
             timeText: '首次：15:00后超时',
             timeStatus: 'urgent',
-            task: '当前任务: 询问痛点',
+            task: '用户纪要：用户咨询少儿英语启蒙课程',
+            taskDetail: '用户咨询少儿英语启蒙课程，对师资背景较为关注，建议提供教师资质介绍，已表示有意向预约试听。',
             info: '3.5岁 | 重点单 | 价格优惠 | 未承诺',
         },
         {
@@ -46,7 +49,8 @@ const tabData: Record<string, CustomerData[]> = {
             color: 'orange',
             timeText: '首次：25:00后超时',
             timeStatus: 'warning',
-            task: '当前任务: 询问痛点',
+            task: '用户纪要：用户了解青少英语提升课程',
+            taskDetail: '用户了解青少英语提升课程，对课程体系较为敏感，建议提供阶段学习规划，已表示有意向进一步了解。',
             info: '5岁 | 常规单 | 绘本阅读精修 | 未承诺',
         },
         {
@@ -55,7 +59,8 @@ const tabData: Record<string, CustomerData[]> = {
             color: 'green',
             timeText: '首次：30:00后超时',
             timeStatus: 'success',
-            task: '当前任务: 询问痛点',
+            task: '用户纪要：用户咨询英语阅读专项班',
+            taskDetail: '用户咨询英语阅读专项班，对教材内容较为关注，建议提供教材样章，已表示有意向报名体验。',
             info: '4岁 | 常规单 | 口语启蒙进阶 | 未承诺',
         },
         {
@@ -64,7 +69,8 @@ const tabData: Record<string, CustomerData[]> = {
             color: 'red',
             timeText: '今日18:00后超时',
             timeStatus: 'urgent',
-            task: '当前任务: 发送课程介绍',
+            task: '用户纪要：用户了解口语强化课程',
+            taskDetail: '用户了解口语强化课程，对班级规模较为敏感，建议提供小班教学说明，已表示有意向预约测评。',
             info: '3岁 | 重点单 | 口语启蒙 | 未承诺',
         },
     ],
@@ -75,7 +81,8 @@ const tabData: Record<string, CustomerData[]> = {
             color: 'red',
             timeText: '今日22:00跟进',
             timeStatus: 'urgent',
-            task: '当前任务: 询问痛点',
+            task: '用户纪要：用户咨询少儿英语启蒙课程',
+            taskDetail: '用户咨询少儿英语启蒙课程，对师资背景较为关注，建议提供教师资质介绍，已表示有意向预约试听。',
             info: '3.5岁 | 重点单 | 价格优惠 | 未承诺',
         },
         {
@@ -84,7 +91,8 @@ const tabData: Record<string, CustomerData[]> = {
             color: 'orange',
             timeText: '2月2日 12:00跟进',
             timeStatus: 'warning',
-            task: '当前任务: 询问痛点',
+            task: '用户纪要：用户了解青少英语提升课程',
+            taskDetail: '用户了解青少英语提升课程，对课程体系较为敏感，建议提供阶段学习规划，已表示有意向进一步了解。',
             info: '5岁 | 常规单 | 绘本阅读精修 | 承诺上门',
         },
         {
@@ -93,7 +101,8 @@ const tabData: Record<string, CustomerData[]> = {
             color: 'green',
             timeText: '2月15日 12:00跟进',
             timeStatus: 'success',
-            task: '当前任务: 询问痛点',
+            task: '用户纪要：用户了解demo课程相关资料',
+            taskDetail: '用户了解demo课程相关资料，对价格较为敏感，建议提供优惠方案，已表示有意向进一步了解。',
             info: '4岁 | 常规单 | 口语启蒙进阶 | 承诺上门',
         },
     ],
@@ -104,7 +113,8 @@ const tabData: Record<string, CustomerData[]> = {
             color: 'red',
             timeText: '今日22:00跟进',
             timeStatus: 'urgent',
-            task: '客户阶段任务: 电话确认一致地址与人数',
+            task: '用户纪要：用户咨询英语阅读专项班',
+            taskDetail: '用户咨询英语阅读专项班，对教材内容较为关注，建议提供教材样章，已表示有意向报名体验。',
             info: '3.5岁 | 重点单 | 价格优惠 | 承诺上门',
         },
         {
@@ -113,7 +123,8 @@ const tabData: Record<string, CustomerData[]> = {
             color: 'orange',
             timeText: '2月2日 12:00跟进',
             timeStatus: 'warning',
-            task: '客户阶段任务: 电话确认一致地址与人数',
+            task: '用户纪要：用户了解青少英语提升课程',
+            taskDetail: '用户了解青少英语提升课程，对课程体系较为敏感，建议提供阶段学习规划，已表示有意向进一步了解。',
             info: '5岁 | 常规单 | 绘本阅读精修 | 承诺上门',
         },
         {
@@ -122,7 +133,8 @@ const tabData: Record<string, CustomerData[]> = {
             color: 'green',
             timeText: '2月15日 12:00跟进',
             timeStatus: 'success',
-            task: '客户阶段任务: 电话确认一致地址与人数',
+            task: '用户纪要：用户了解demo课程相关资料',
+            taskDetail: '用户了解demo课程相关资料，对价格较为敏感，建议提供优惠方案，已表示有意向进一步了解。',
             info: '4岁 | 常规单 | 口语启蒙进阶 | 承诺上门',
         },
     ],
@@ -133,7 +145,8 @@ const tabData: Record<string, CustomerData[]> = {
             color: 'red',
             timeText: '首次：15:00后超时',
             timeStatus: 'urgent',
-            task: '客户阶段任务: 电话确认一致地址与人数',
+            task: '用户纪要：用户咨询英语阅读专项班',
+            taskDetail: '用户咨询英语阅读专项班，对教材内容较为关注，建议提供教材样章，已表示有意向报名体验。',
             info: '3.5岁 | 重点单 | 价格优惠 | 承诺上门',
         },
         {
@@ -142,7 +155,8 @@ const tabData: Record<string, CustomerData[]> = {
             color: 'red',
             timeText: '今日22:00跟进',
             timeStatus: 'urgent',
-            task: '当前任务: 询问痛点',
+            task: '用户纪要：用户咨询少儿英语启蒙课程',
+            taskDetail: '用户咨询少儿英语启蒙课程，对师资背景较为关注，建议提供教师资质介绍，已表示有意向预约试听。',
             info: '3.5岁 | 重点单 | 价格优惠 | 未承诺',
         },
         {
@@ -151,7 +165,8 @@ const tabData: Record<string, CustomerData[]> = {
             color: 'orange',
             timeText: '今日14:00跟进',
             timeStatus: 'warning',
-            task: '当前任务: 确认demo邀约信息',
+            task: '用户纪要：用户了解口语强化课程',
+            taskDetail: '用户了解口语强化课程，对班级规模较为敏感，建议提供小班教学说明，已表示有意向预约测评。',
             info: '3岁 | 优惠价格 | 服务策略 | 承诺上门',
         },
     ],
@@ -314,6 +329,20 @@ export default function Workbench() {
                         if (rest.source_channel) cardTags.push(rest.source_channel);
                         if (rest.custom_tags && Array.isArray(rest.custom_tags)) cardTags.push(...rest.custom_tags);
 
+                        // Demo 文案映射：按客户姓名决定用户纪要内容
+                        const demoTaskMap: Record<string, { task: string; taskDetail: string }> = {
+                            '欧阳春晓': { task: '用户纪要：用户咨询少儿英语启蒙课程', taskDetail: '用户咨询少儿英语启蒙课程，对师资背景较为关注，建议提供教师资质介绍，已表示有意向预约试听。' },
+                            '欧阳小明': { task: '用户纪要：用户咨询英语阅读专项班', taskDetail: '用户咨询英语阅读专项班，对教材内容较为关注，建议提供教材样章，已表示有意向报名体验。' },
+                            '王梓轩': { task: '用户纪要：用户了解青少英语提升课程', taskDetail: '用户了解青少英语提升课程，对课程体系较为敏感，建议提供阶段学习规划，已表示有意向进一步了解。' },
+                            '陈杰森': { task: '用户纪要：用户了解口语强化课程', taskDetail: '用户了解口语强化课程，对班级规模较为敏感，建议提供小班教学说明，已表示有意向预约测评。' },
+                            '李明妈妈': { task: '用户纪要：用户了解demo课程相关资料', taskDetail: '用户了解demo课程相关资料，对价格较为敏感，建议提供优惠方案，已表示有意向进一步了解。' },
+                            '张三的家长': { task: '用户纪要：用户咨询少儿英语启蒙课程', taskDetail: '用户咨询少儿英语启蒙课程，对师资背景较为关注，建议提供教师资质介绍，已表示有意向预约试听。' },
+                            '萱萱': { task: '用户纪要：用户咨询英语阅读专项班', taskDetail: '用户咨询英语阅读专项班，对教材内容较为关注，建议提供教材样章，已表示有意向报名体验。' },
+                        };
+                        const demoTask = demoTaskMap[rest.name];
+                        const cardTask = demoTask ? demoTask.task : (rest.customer_stage ? `用户纪要：${rest.customer_stage}` : '用户纪要：跟进');
+                        const cardTaskDetail = demoTask ? demoTask.taskDetail : undefined;
+
                         return (
                             <div key={id || `customer-${index}`}>
                                 <CustomerCard
@@ -323,7 +352,8 @@ export default function Workbench() {
                                     color={rest.color || 'red'}
                                     timeText={rest.time_text || ''}
                                     timeStatus={rest.time_status || 'urgent'}
-                                    task={rest.customer_stage ? `当前任务: ${rest.customer_stage}` : '当前任务: 跟进'}
+                                    task={cardTask}
+                                    taskDetail={cardTaskDetail}
                                     info={[rest.product_line, rest.is_key_deal ? '重点单' : '常规单', rest.customer_level ? `${rest.customer_level}类客户` : '', rest.customer_stage].filter(Boolean).join(' | ')}
                                     first_response_deadline_at={rest.first_response_deadline_at}
                                     follow_up_period_days={rest.follow_up_period_days}
@@ -344,12 +374,13 @@ export default function Workbench() {
 }
 
 // ─── 客户卡片 ─────────────────────────────────────────────────────────────────
-function CustomerCard({ id, name, tags, color, timeText, timeStatus, task, info, first_response_deadline_at, follow_up_period_days, min_follow_ups_required }: CustomerData) {
+function CustomerCard({ id, name, tags, color, timeText, timeStatus, task, taskDetail, info, first_response_deadline_at, follow_up_period_days, min_follow_ups_required }: CustomerData) {
     const navigate = useNavigate();
 
     /* 倒计时逻辑 */
     const [timeLeft, setTimeLeft] = useState<string>('');
     const [isTimeout, setIsTimeout] = useState(false);
+    const [taskExpanded, setTaskExpanded] = useState(false);
 
     useEffect(() => {
         if (timeText) {
@@ -459,13 +490,41 @@ function CustomerCard({ id, name, tags, color, timeText, timeStatus, task, info,
             </div>
 
             {/* 任务描述 */}
-            <div className="bg-orange-50 rounded-lg px-3 py-2 mb-4 inline-block w-full">
-                <span className="text-xs text-orange-500 font-bold">
-                    <span className="text-orange-400 mr-1">
-                        {task.startsWith('客户阶段任务') ? '客户阶段任务:' : '当前任务:'}
+            <div className="bg-orange-50 rounded-lg px-3 py-2 mb-4 w-full">
+                <div className="flex items-center justify-between">
+                    <span className="text-xs text-orange-500 font-bold flex-1 min-w-0 truncate">
+                        <span className="text-orange-400 mr-1">
+                            {task.startsWith('用户纪要') ? '' : task.startsWith('客户阶段任务') ? '客户阶段任务:' : '当前任务:'}
+                        </span>
+                        {task.startsWith('用户纪要') ? task : task.replace('当前任务: ', '').replace('客户阶段任务: ', '')}
                     </span>
-                    {task.replace('当前任务: ', '').replace('客户阶段任务: ', '')}
-                </span>
+                    <div className="flex items-center gap-1.5 ml-2 shrink-0">
+                        <button
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                            className="w-6 h-6 flex items-center justify-center text-orange-400 hover:text-orange-600 transition-colors"
+                        >
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                                <polygon points="2,1 11,6 2,11" />
+                            </svg>
+                        </button>
+                        <button
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setTaskExpanded(v => !v); }}
+                            className="w-6 h-6 flex items-center justify-center text-orange-400 hover:text-orange-600 transition-colors"
+                        >
+                            <svg
+                                width="12" height="12" viewBox="0 0 12 12" fill="currentColor"
+                                style={{ transform: taskExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
+                            >
+                                <polygon points="1,3 6,9 11,3" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                {taskDetail && taskExpanded && (
+                    <div className="mt-2 pt-2 border-t border-orange-100 text-xs text-orange-500 leading-relaxed">
+                        {taskDetail}
+                    </div>
+                )}
             </div>
 
             {/* 底部: 信息标签 + 操作按钮 */}

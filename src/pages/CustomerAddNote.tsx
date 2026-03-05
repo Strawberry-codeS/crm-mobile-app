@@ -38,6 +38,7 @@ export default function CustomerAddNote() {
 
     const [showFollowUpModal, setShowFollowUpModal] = useState(false);
     const [showDemoModal, setShowDemoModal] = useState(false);
+    const [showDisputeModal, setShowDisputeModal] = useState(false);
 
     const toggleMultiSelect = (state: string[], setState: (val: string[]) => void, value: string) => {
         if (state.includes(value)) {
@@ -381,15 +382,20 @@ export default function CustomerAddNote() {
                 </div>
 
                 {/* Footer */}
-                <div className="flex gap-4 pt-4 pb-8">
-                    <button className="w-1/3 py-3.5 rounded-full text-gray-500 font-bold bg-white shadow-sm" onClick={() => navigate(-1)}>取消</button>
+                <div className="flex gap-3 pt-4 pb-8 items-center">
+                    <button className="w-1/4 py-3.5 rounded-full text-gray-500 font-bold bg-white shadow-sm" onClick={() => navigate(-1)}>取消</button>
                     <button className="flex-1 py-3.5 rounded-full bg-violet-600 text-white font-bold shadow-lg shadow-violet-200" onClick={handleSave}>保存并完成</button>
+                    <button
+                        onClick={() => setShowDisputeModal(true)}
+                        className="w-16 py-3.5 rounded-full border border-gray-200 bg-white text-gray-600 font-bold text-sm flex-shrink-0 hover:bg-gray-50 transition-colors"
+                    >争议</button>
                 </div>
             </div>
 
             {/* Modals */}
             {showFollowUpModal && <NextFollowUpModal onClose={() => setShowFollowUpModal(false)} />}
             {showDemoModal && <DemoAppointmentModal onClose={() => setShowDemoModal(false)} />}
+            {showDisputeModal && <DisputeModal onClose={() => setShowDisputeModal(false)} />}
         </div>
     );
 }
@@ -585,6 +591,49 @@ function DemoAppointmentModal({ onClose }: { onClose: () => void }) {
             </div>
         </div>
     )
+}
+
+function DisputeModal({ onClose }: { onClose: () => void }) {
+    const [disputeText, setDisputeText] = useState('');
+
+    return (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center px-6">
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+            <div className="bg-white rounded-2xl w-full max-w-sm p-6 relative z-10 shadow-xl">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-5">
+                    <h3 className="text-base font-bold text-gray-900">咨询量争议反馈</h3>
+                    <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 transition-colors">
+                        <X size={20} className="text-gray-400" />
+                    </button>
+                </div>
+
+                {/* Textarea */}
+                <div className="mb-2">
+                    <label className="block text-sm text-gray-700 mb-2">详细说明</label>
+                    <textarea
+                        className="w-full border border-gray-200 rounded-xl p-3 text-sm text-gray-700 placeholder-gray-400 resize-none h-28 outline-none focus:ring-2 focus:ring-violet-400 transition"
+                        placeholder="请输入详细说明..."
+                        value={disputeText}
+                        onChange={(e) => setDisputeText(e.target.value)}
+                    />
+                </div>
+                <p className="text-xs text-gray-400 mb-6">说明：提交争议后自动保存本次纪要进行提交，且争议通过后客户自动收回，是否提交争议。</p>
+
+                {/* Buttons */}
+                <div className="flex gap-3">
+                    <button
+                        onClick={onClose}
+                        className="flex-1 py-3 rounded-full border border-gray-200 text-gray-500 font-bold bg-white hover:bg-gray-50 transition-colors"
+                    >取消</button>
+                    <button
+                        onClick={onClose}
+                        className="flex-1 py-3 rounded-full bg-violet-600 text-white font-bold shadow-lg shadow-violet-200 hover:bg-violet-700 transition-colors"
+                    >提交</button>
+                </div>
+            </div>
+        </div>
+    );
 }
 
 function ChevronDownIcon() {

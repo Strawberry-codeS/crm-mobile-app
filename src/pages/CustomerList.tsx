@@ -90,7 +90,7 @@ export default function CustomerList() {
             id={c.id}
             name={c.name}
             tags={[c.source_channel].filter(Boolean) as string[]}
-            task={c.customer_stage ? `当前任务: ${c.customer_stage}` : '当前任务: 跟进'}
+            task={c.customer_stage ? `用户纪要：${c.customer_stage}` : '用户纪要：跟进'}
             info={buildInfo(c)}
             time={c.time_text ?? ''}
             color={(c.color as string) ?? 'gray'}
@@ -216,6 +216,7 @@ function FilterChip({ children, active }: any) {
 function CustomerItem({ id, name, tags, task, info, time, urgent, status, color = "red", timeStatus = "urgent" }: any) {
   const navigate = useNavigate();
   const isDone = status === 'done';
+  const [taskExpanded, setTaskExpanded] = useState(false);
 
   let borderClass = "border-l-[6px] border-red-400";
   if (color === 'orange') borderClass = "border-l-[6px] border-orange-400";
@@ -251,8 +252,36 @@ function CustomerItem({ id, name, tags, task, info, time, urgent, status, color 
         </div>
       </div>
 
-      <div className="bg-orange-50 rounded-lg px-3 py-2 mb-4 inline-block w-full">
-        <span className="text-xs text-orange-500 font-bold"><span className="text-orange-400 mr-1">当前任务:</span> {task.replace('当前任务: ', '').replace('客户阶段任务: ', '')}</span>
+      <div className="bg-orange-50 rounded-lg px-3 py-2 mb-4 w-full">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-orange-500 font-bold flex-1 min-w-0 truncate">
+            <span className="text-orange-400 mr-1">
+              {task.startsWith('用户纪要') ? '' : '当前任务:'}
+            </span>
+            {task.startsWith('用户纪要') ? task : task.replace('当前任务: ', '').replace('客户阶段任务: ', '')}
+          </span>
+          <div className="flex items-center gap-1.5 ml-2 shrink-0">
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+              className="w-6 h-6 flex items-center justify-center text-orange-400 hover:text-orange-600 transition-colors"
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                <polygon points="2,1 11,6 2,11" />
+              </svg>
+            </button>
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setTaskExpanded(v => !v); }}
+              className="w-6 h-6 flex items-center justify-center text-orange-400 hover:text-orange-600 transition-colors"
+            >
+              <svg
+                width="12" height="12" viewBox="0 0 12 12" fill="currentColor"
+                style={{ transform: taskExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
+              >
+                <polygon points="1,3 6,9 11,3" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="flex justify-between items-end">

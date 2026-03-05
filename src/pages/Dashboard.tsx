@@ -475,22 +475,37 @@ export default function Dashboard() {
           {!customersLoading && customers.length === 0 && (
             <div className="text-center py-10 text-gray-400 text-sm">暂无客户数据</div>
           )}
-          {!customersLoading && customers.map((c) => (
-            <TaskCard
-              key={c.id}
-              id={c.id}
-              name={c.name}
-              tags={buildTags(c)}
-              color={(c.color as 'red' | 'orange' | 'green') ?? 'red'}
-              timeText={c.time_text ?? ''}
-              timeStatus={(c.time_status as 'urgent' | 'warning' | 'success') ?? 'urgent'}
-              task={c.customer_stage ? `当前任务: ${c.customer_stage}` : '当前任务: 跟进'}
-              info={buildInfo(c)}
-              first_response_deadline_at={c.first_response_deadline_at}
-              follow_up_period_days={c.follow_up_period_days}
-              min_follow_ups_required={c.min_follow_ups_required}
-            />
-          ))}
+          {!customersLoading && customers.map((c) => {
+            const demoTaskMap: Record<string, { task: string; taskDetail: string }> = {
+              '欧阳春晓': { task: '用户纪要：用户咨询少儿英语启蒙课程', taskDetail: '用户咨询少儿英语启蒙课程，对师资背景较为关注，建议提供教师资质介绍，已表示有意向预约试听。' },
+              '欧阳小明': { task: '用户纪要：用户咨询英语阅读专项班', taskDetail: '用户咨询英语阅读专项班，对教材内容较为关注，建议提供教材样章，已表示有意向报名体验。' },
+              '王梓轩': { task: '用户纪要：用户了解青少英语提升课程', taskDetail: '用户了解青少英语提升课程，对课程体系较为敏感，建议提供阶段学习规划，已表示有意向进一步了解。' },
+              '陈杰森': { task: '用户纪要：用户了解口语强化课程', taskDetail: '用户了解口语强化课程，对班级规模较为敏感，建议提供小班教学说明，已表示有意向预约测评。' },
+              '李明妈妈': { task: '用户纪要：用户了解demo课程相关资料', taskDetail: '用户了解demo课程相关资料，对价格较为敏感，建议提供优惠方案，已表示有意向进一步了解。' },
+              '张三的家长': { task: '用户纪要：用户咨询少儿英语启蒙课程', taskDetail: '用户咨询少儿英语启蒙课程，对师资背景较为关注，建议提供教师资质介绍，已表示有意向预约试听。' },
+              '萱萱': { task: '用户纪要：用户咨询英语阅读专项班', taskDetail: '用户咨询英语阅读专项班，对教材内容较为关注，建议提供教材样章，已表示有意向报名体验。' },
+            };
+            const demoTask = demoTaskMap[c.name];
+            const cardTask = demoTask ? demoTask.task : (c.customer_stage ? `用户纪要：${c.customer_stage}` : '用户纪要：跟进');
+            const cardTaskDetail = demoTask ? demoTask.taskDetail : undefined;
+            return (
+              <TaskCard
+                key={c.id}
+                id={c.id}
+                name={c.name}
+                tags={buildTags(c)}
+                color={(c.color as 'red' | 'orange' | 'green') ?? 'red'}
+                timeText={c.time_text ?? ''}
+                timeStatus={(c.time_status as 'urgent' | 'warning' | 'success') ?? 'urgent'}
+                task={cardTask}
+                taskDetail={cardTaskDetail}
+                info={buildInfo(c)}
+                first_response_deadline_at={c.first_response_deadline_at}
+                follow_up_period_days={c.follow_up_period_days}
+                min_follow_ups_required={c.min_follow_ups_required}
+              />
+            );
+          })}
         </motion.div>
       </AnimatePresence>
 
@@ -613,7 +628,8 @@ function CalendarPopup({ onClose, onFilterClick }: { onClose: () => void, onFilt
             <TaskCard
               name="张三的家长"
               tags={['待跟进', '小红书活动']}
-              task="客户阶段任务: 电话确认一致地址与人数"
+              task="用户纪要：用户咨询少儿英语启蒙课程"
+              taskDetail="用户咨询少儿英语启蒙课程，对师资背景较为关注，建议提供教师资质介绍，已表示有意向预约试听。"
               info="3.5岁 | 重点单 | 价格优惠"
               timeText="05:12 后超时"
               timeStatus="urgent"
@@ -622,7 +638,8 @@ function CalendarPopup({ onClose, onFilterClick }: { onClose: () => void, onFilt
             <TaskCard
               name="王梓轩"
               tags={['待跟进', '小红书活动']}
-              task="客户阶段任务: 电话确认一致地址与人数"
+              task="用户纪要：用户了解青少英语提升课程"
+              taskDetail="用户了解青少英语提升课程，对课程体系较为敏感，建议提供阶段学习规划，已表示有意向进一步了解。"
               info="5岁 | 常规单 | 绘本阅读精修"
               timeText="22:45 后超时"
               timeStatus="warning"
@@ -631,7 +648,8 @@ function CalendarPopup({ onClose, onFilterClick }: { onClose: () => void, onFilt
             <TaskCard
               name="李明妈妈"
               tags={['地推-商场采单']}
-              task="当前任务: 询问痛点"
+              task="用户纪要：用户了解demo课程相关资料"
+              taskDetail="用户了解demo课程相关资料，对价格较为敏感，建议提供优惠方案，已表示有意向进一步了解。"
               info="4岁 | 常规单 | 口语启蒙进阶 | 承诺上门"
               timeText="2月15日 12:00跟进"
               timeStatus="success"
@@ -956,11 +974,12 @@ const borderMap = { red: 'border-l-[6px] border-red-400', orange: 'border-l-[6px
 const clockFillMap = { urgent: '#FCA5A5', warning: '#FDBA74', success: '#6EE7B7' };
 const timeColorMap = { urgent: 'text-red-500', warning: 'text-orange-500', success: 'text-emerald-500' };
 
-function TaskCard({ id, name, tags, color = 'red', timeText, timeStatus = 'urgent', task, info, first_response_deadline_at, follow_up_period_days, min_follow_ups_required }: any) {
+function TaskCard({ id, name, tags, color = 'red', timeText, timeStatus = 'urgent', task, taskDetail, info, first_response_deadline_at, follow_up_period_days, min_follow_ups_required }: any) {
   const navigate = useNavigate();
 
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [isTimeout, setIsTimeout] = useState(false);
+  const [taskExpanded, setTaskExpanded] = useState(false);
 
   useEffect(() => {
     if (timeText) {
@@ -1047,13 +1066,46 @@ function TaskCard({ id, name, tags, color = 'red', timeText, timeStatus = 'urgen
       </div>
 
       {/* 任务描述 */}
-      <div className="bg-orange-50 rounded-lg px-3 py-2 mb-4 inline-block w-full">
-        <span className="text-xs text-orange-500 font-bold">
-          <span className="text-orange-400 mr-1">
-            {task.startsWith('客户阶段任务') ? '客户阶段任务:' : '当前任务:'}
+      <div className="bg-orange-50 rounded-lg px-3 py-2 mb-4 w-full">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-orange-500 font-bold flex-1 min-w-0 truncate">
+            <span className="text-orange-400 mr-1">
+              {task.startsWith('客户阶段任务') ? '客户阶段任务:' : task.startsWith('用户纪要') ? '' : '当前任务:'}
+            </span>
+            {task.startsWith('用户纪要') ? task : task.replace('当前任务: ', '').replace('客户阶段任务: ', '')}
           </span>
-          {task.replace('当前任务: ', '').replace('客户阶段任务: ', '')}
-        </span>
+          <div className="flex items-center gap-1.5 ml-2 shrink-0">
+            {/* 播放按钮 */}
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+              className="w-6 h-6 flex items-center justify-center text-orange-400 hover:text-orange-600 transition-colors"
+              title="播放"
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                <polygon points="2,1 11,6 2,11" />
+              </svg>
+            </button>
+            {/* 下拉按钮 */}
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setTaskExpanded(v => !v); }}
+              className="w-6 h-6 flex items-center justify-center text-orange-400 hover:text-orange-600 transition-colors"
+              title="展开详情"
+            >
+              <svg
+                width="12" height="12" viewBox="0 0 12 12" fill="currentColor"
+                style={{ transform: taskExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
+              >
+                <polygon points="1,3 6,9 11,3" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        {/* 展开详情 */}
+        {taskDetail && taskExpanded && (
+          <div className="mt-2 pt-2 border-t border-orange-100 text-xs text-orange-500 leading-relaxed">
+            {taskDetail}
+          </div>
+        )}
       </div>
 
       {/* 底部：信息标签 + 操作按钮 */}
