@@ -9,6 +9,7 @@ import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import Messages from './pages/Messages';
 import Login from './pages/Login';
+import DataDashboard from './pages/DataDashboard';
 import { useAuth } from './hooks/useAuth';
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="customers/:id/add-note" element={<CustomerAddNote />} />
           <Route path="profile" element={<Profile />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="data-dashboard" element={<DataDashboard />} />
         </Route>
         <Route path="/messages" element={<Messages />} />
         {/* Redirect /login to / */}

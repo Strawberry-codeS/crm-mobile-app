@@ -1,4 +1,4 @@
-import { User, Settings, LogOut, ChevronRight } from 'lucide-react';
+import { User, Settings, ChevronRight, BarChart2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Profile() {
@@ -16,6 +16,19 @@ export default function Profile() {
       </div>
 
       <div className="space-y-4">
+        <Link to="/data-dashboard" className="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between block">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center text-violet-500">
+              <BarChart2 size={20} />
+            </div>
+            <div>
+              <div className="font-bold text-gray-900">数据报表</div>
+              <div className="text-xs text-gray-400">查看各项数据统计</div>
+            </div>
+          </div>
+          <ChevronRight className="text-gray-300" size={20} />
+        </Link>
+
         <Link to="/settings" className="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between block">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">

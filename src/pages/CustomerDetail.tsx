@@ -1,6 +1,6 @@
 import { ChevronLeft, Edit2, Copy, Plus, HelpCircle, Phone, MessageSquare, Users, CheckCircle, Clock, Calendar, ShoppingBag, ShoppingCart, ChevronDown, ChevronUp, FileText } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useRef, useEffect, type MouseEvent as RMouseEvent } from 'react';
 import { cn } from '@/lib/utils';
 import { useCustomer } from '@/hooks/useCustomer';
 
@@ -459,10 +459,7 @@ function NotesView({ notes }: { notes: any[] }) {
                 </div>
               )}
               {note.call_status && (
-                <div className="flex gap-2">
-                  {note.duration_seconds && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">通话 {note.duration_seconds}</span>}
-                  {note.call_status && <span className="text-xs bg-emerald-100 text-emerald-600 px-2 py-1 rounded">{note.call_status}</span>}
-                </div>
+                <CallPlayer duration={note.duration_seconds} status={note.call_status} />
               )}
             </TimelineItem>
           )
@@ -470,6 +467,154 @@ function NotesView({ notes }: { notes: any[] }) {
       </div>
     </div>
   )
+}
+
+// ─── 通话播放器组件 ────────────────────────────────────────────────────────────
+function CallPlayer({ duration, status }: { duration: string; status: string }) {
+  // Convert "MM:SS" to total seconds
+  const [mm, ss] = duration.split(':').map(Number);
+  const totalSecs = mm * 60 + ss;
+
+  const [expanded, setExpanded] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+  const [speed, setSpeed] = useState(1.0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // ─ progress tick ─
+  useEffect(() => {
+    if (playing) {
+      intervalRef.current = setInterval(() => {
+        setElapsed(e => {
+          if (e + 1 >= totalSecs) {
+            setPlaying(false);
+            return totalSecs;
+          }
+          return e + 1;
+        });
+      }, 1000 / speed);
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    }
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [playing, speed, totalSecs]);
+
+  // ─ click outside to collapse ─
+  useEffect(() => {
+    if (!expanded) return;
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setExpanded(false);
+        setPlaying(false);
+        setElapsed(0);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [expanded]);
+
+  const handlePlay = (e: RMouseEvent) => {
+    e.stopPropagation();
+    if (!expanded) {
+      setExpanded(true);
+      setPlaying(true);
+      setElapsed(0);
+    } else {
+      setPlaying(v => !v);
+    }
+  };
+
+  // Format elapsed seconds for display
+  const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+  const pct = totalSecs > 0 ? (elapsed / totalSecs) * 100 : 0;
+
+  const speeds = [1.0, 1.5, 2.0];
+  const cycleSpeed = (e: RMouseEvent) => {
+    e.stopPropagation();
+    setSpeed(s => speeds[(speeds.indexOf(s) + 1) % speeds.length]);
+  };
+
+  return (
+    <div ref={containerRef} className="mt-1">
+      {!expanded ? (
+        /* ── 收起态: 播放按钮 pill ── */
+        <button
+          onClick={handlePlay}
+          className="flex items-center gap-2 bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full text-sm text-gray-700 font-medium hover:bg-gray-100 transition-colors"
+        >
+          {/* Play triangle */}
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="#6D28D9">
+            <polygon points="2,1 11,6 2,11" />
+          </svg>
+          <span>通话 {duration}</span>
+        </button>
+      ) : (
+        /* ── 展开态: 播放器行 ── */
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full">
+            {/* Pause / Play toggle */}
+            <button onClick={handlePlay} className="flex-shrink-0 text-violet-600">
+              {playing ? (
+                /* Pause icon */
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="#6D28D9">
+                  <rect x="2" y="2" width="3.5" height="10" rx="1" />
+                  <rect x="8.5" y="2" width="3.5" height="10" rx="1" />
+                </svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="#6D28D9">
+                  <polygon points="2,1 13,7 2,13" />
+                </svg>
+              )}
+            </button>
+
+            <span className="text-xs font-medium text-gray-700 flex-shrink-0">通话</span>
+
+            {/* Progress track */}
+            <div className="relative flex-1 h-1.5 bg-gray-200 rounded-full mx-1">
+              <div
+                className="absolute left-0 top-0 h-1.5 bg-violet-500 rounded-full transition-all"
+                style={{ width: `${pct}%` }}
+              />
+              {/* Thumb */}
+              <div
+                className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-white border-2 border-violet-500 rounded-full shadow-sm"
+                style={{ left: `calc(${pct}% - 7px)` }}
+              />
+              {/* Invisible range input for seeking */}
+              <input
+                type="range"
+                min={0}
+                max={totalSecs}
+                value={elapsed}
+                onChange={e => { setElapsed(Number(e.target.value)); }}
+                onClick={e => e.stopPropagation()}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+            </div>
+
+            {/* Time */}
+            <span className="text-xs text-gray-500 flex-shrink-0 w-9 text-right">{fmt(elapsed)}</span>
+
+            {/* Speed */}
+            <button
+              onClick={cycleSpeed}
+              className="text-xs font-bold text-violet-600 flex-shrink-0 w-8 text-right"
+            >
+              {speed.toFixed(1)}x
+            </button>
+          </div>
+
+          {/* 已接通 badge on its own row */}
+          <div>
+            <span className="text-xs bg-emerald-100 text-emerald-600 px-2 py-1 rounded-full font-medium">
+              {status}
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 function TimelineItem({ icon, color, title, time, children }: any) {

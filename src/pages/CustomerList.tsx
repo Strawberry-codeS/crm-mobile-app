@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useCustomers } from '@/hooks/useCustomers';
 import type { Customer as CustomerData } from '@/lib/supabase';
+import { InlineCallPlayer, useInlineCallPlayer } from '@/components/InlineCallPlayer';
 
 export default function CustomerList() {
   const [showFilter, setShowFilter] = useState(false);
@@ -217,6 +218,7 @@ function CustomerItem({ id, name, tags, task, info, time, urgent, status, color 
   const navigate = useNavigate();
   const isDone = status === 'done';
   const [taskExpanded, setTaskExpanded] = useState(false);
+  const callPlayer = useInlineCallPlayer("03:15");
 
   let borderClass = "border-l-[6px] border-red-400";
   if (color === 'orange') borderClass = "border-l-[6px] border-orange-400";
@@ -261,14 +263,26 @@ function CustomerItem({ id, name, tags, task, info, time, urgent, status, color 
             {task.startsWith('用户纪要') ? task : task.replace('当前任务: ', '').replace('客户阶段任务: ', '')}
           </span>
           <div className="flex items-center gap-1.5 ml-2 shrink-0">
-            <button
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-              className="w-6 h-6 flex items-center justify-center text-orange-400 hover:text-orange-600 transition-colors"
-            >
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-                <polygon points="2,1 11,6 2,11" />
-              </svg>
-            </button>
+            {/* 播放按钮 */}
+            {task.startsWith('用户纪要') && (
+              <button
+                onClick={callPlayer.togglePlay}
+                className="w-6 h-6 flex items-center justify-center text-orange-400 hover:text-orange-600 transition-colors bg-white rounded-full shadow-sm"
+                title="播放"
+              >
+                {callPlayer.playing ? (
+                  <svg width="10" height="10" viewBox="0 0 14 14" fill="currentColor">
+                    <rect x="2" y="2" width="3.5" height="10" rx="1" />
+                    <rect x="8.5" y="2" width="3.5" height="10" rx="1" />
+                  </svg>
+                ) : (
+                  <svg width="10" height="10" viewBox="0 0 12 12" fill="currentColor">
+                    <polygon points="3,2 10,6 3,10" />
+                  </svg>
+                )}
+              </button>
+            )}
+            {/* 下拉按钮 */}
             <button
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); setTaskExpanded(v => !v); }}
               className="w-6 h-6 flex items-center justify-center text-orange-400 hover:text-orange-600 transition-colors"
@@ -282,6 +296,9 @@ function CustomerItem({ id, name, tags, task, info, time, urgent, status, color 
             </button>
           </div>
         </div>
+
+        {/* Inline call player expanded view */}
+        {task.startsWith('用户纪要') && <InlineCallPlayer player={callPlayer} />}
       </div>
 
       <div className="flex justify-between items-end">
