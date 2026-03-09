@@ -1,373 +1,197 @@
-import { useState, ReactNode } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, MoreVertical, ChevronDown, Users, DollarSign, BookOpen, Footprints, AlertTriangle, Lightbulb } from 'lucide-react';
-import { cn } from '@/lib/utils';
-
-// ─── 数据定义 ──────────────────────────────────────────────────────────────────
-
-type Period = '日' | '周' | '月';
-
-// 指标选项
-const METRIC_OPTIONS = ['报名人数', '现金', '跟进人数', '上门人数', '已超时'];
-
-// 各周期下的图表数据
-const chartData: Record<Period, { label: string; value: number }[]> = {
-    日: [
-        { label: '周一', value: 30 },
-        { label: '周二', value: 45 },
-        { label: '周三', value: 60 },
-        { label: '周四', value: 85 },
-        { label: '周五', value: 75 },
-        { label: '周六', value: 90 },
-        { label: '周日', value: 65 },
-    ],
-    周: [
-        { label: '周一', value: 25 },
-        { label: '周二', value: 40 },
-        { label: '周三', value: 55 },
-        { label: '周四', value: 75 },
-        { label: '周五', value: 65 },
-        { label: '周六', value: 90 },
-        { label: '周日', value: 50 },
-    ],
-    月: [
-        { label: '1月', value: 60 },
-        { label: '2月', value: 45 },
-        { label: '3月', value: 75 },
-        { label: '4月', value: 80 },
-        { label: '5月', value: 70 },
-        { label: '6月', value: 90 },
-        { label: '7月', value: 55 },
-    ],
-};
-
-// 各周期下的指标数据
-type MetricData = {
-    signups: { value: number; target: number };
-    cash: { value: number | string; target?: number };
-    followUps: { value: number; target: number };
-    visits: { value: number; target: number };
-    overdue: { value: number; target?: number };
-    advice: string;
-};
-
-const metricData: Record<Period, MetricData> = {
-    日: {
-        signups: { value: 18, target: 20 },
-        cash: { value: 42, target: 50 },
-        followUps: { value: 28, target: 35 },
-        visits: { value: 12, target: 15 },
-        overdue: { value: 12, target: 15 },
-        advice: '今日报名表现良好，较昨日同时段提升5%。建议重点跟进高意向客户，并优先处理已超时任务。',
-    },
-    周: {
-        signups: { value: 85, target: 92 },
-        cash: { value: '74k' },
-        followUps: { value: 66, target: 74 },
-        visits: { value: 40, target: 50 },
-        overdue: { value: 12 },
-        advice: '本周转化率提升了5%，建议加大新线索的开发力度以保持这一趋势。',
-    },
-    月: {
-        signups: { value: 320, target: 400 },
-        cash: { value: '280k' },
-        followUps: { value: 260, target: 320 },
-        visits: { value: 150, target: 200 },
-        overdue: { value: 45 },
-        advice: '本月整体完成率达到80%，建议下月重点提升上门转化，目标转化率提升至75%。',
-    },
-};
-
-// ─── 条形图组件 ────────────────────────────────────────────────────────────────
-
-function BarChart({ data, animKey }: { data: { label: string; value: number }[]; animKey: string }) {
-    const maxVal = 100;
-    const svgWidth = 280;
-    const svgHeight = 120;
-    const barWidth = Math.floor(svgWidth / data.length) - 8;
-    const gap = (svgWidth - barWidth * data.length) / (data.length + 1);
-
-    const yLines = [100, 75, 50, 25, 0];
-    // stagger delay per bar: 40ms each
-    const STAGGER = 40;
-    const DURATION = 380;
-
-    return (
-        <div className="relative">
-            <svg
-                key={animKey}
-                width="100%"
-                viewBox={`0 0 ${svgWidth + 40} ${svgHeight + 30}`}
-                className="overflow-visible"
-            >
-                {/* Y-axis grid lines */}
-                {yLines.map((v) => {
-                    const y = ((maxVal - v) / maxVal) * svgHeight;
-                    return (
-                        <g key={v}>
-                            <line x1={38} y1={y} x2={svgWidth + 38} y2={y} stroke="#E5E7EB" strokeWidth={0.5} strokeDasharray="4,2" />
-                            <text x={34} y={y + 4} textAnchor="end" fill="#9CA3AF" fontSize={8}>{v}</text>
-                        </g>
-                    );
-                })}
-
-                {/* Bars with grow-from-bottom animation */}
-                {data.map((d, i) => {
-                    const barHeight = (d.value / maxVal) * svgHeight;
-                    const x = 38 + gap + i * (barWidth + gap);
-                    const baseY = svgHeight; // bottom anchor
-                    const isHighest = d.value === Math.max(...data.map(dd => dd.value));
-                    const fill = isHighest ? '#7C3AED' : '#C4B5FD';
-                    const delay = `${i * STAGGER}ms`;
-                    const dur = `${DURATION}ms`;
-
-                    return (
-                        <g key={`${animKey}-${d.label}`}>
-                            {/* Clipping rect that grows from 0 to full height */}
-                            <rect
-                                x={x}
-                                y={baseY - barHeight}
-                                width={barWidth}
-                                height={barHeight}
-                                rx={4}
-                                fill={fill}
-                                style={{
-                                    transformOrigin: `${x + barWidth / 2}px ${baseY}px`,
-                                    animation: `barGrow ${dur} cubic-bezier(.34,1.3,.64,1) ${delay} both`,
-                                }}
-                            />
-                            <text
-                                x={x + barWidth / 2}
-                                y={svgHeight + 14}
-                                textAnchor="middle"
-                                fill="#9CA3AF"
-                                fontSize={8}
-                            >
-                                {d.label}
-                            </text>
-                        </g>
-                    );
-                })}
-            </svg>
-
-            {/* Global keyframe injected once */}
-            <style>{`
-                @keyframes barGrow {
-                    from { transform: scaleY(0); opacity: 0; }
-                    to   { transform: scaleY(1); opacity: 1; }
-                }
-            `}</style>
-        </div>
-    );
-}
-
-// ─── 进度条组件 ────────────────────────────────────────────────────────────────
-
-function ProgressBar({ value, target, color }: { value: number; target?: number; color: string }) {
-    const pct = target ? Math.min((value / target) * 100, 100) : 80;
-    return (
-        <div className="w-full h-1.5 bg-gray-100 rounded-full mt-2">
-            <div
-                className={`h-1.5 rounded-full ${color}`}
-                style={{ width: `${pct}%` }}
-            />
-        </div>
-    );
-}
-
-// ─── 指标卡组件 ────────────────────────────────────────────────────────────────
-
-function MetricCard({
-    icon,
-    iconBg,
-    label,
-    value,
-    target,
-    barColor,
-    fullWidth = false,
-}: {
-    icon: ReactNode;
-    iconBg: string;
-    label: string;
-    value: number | string;
-    target?: number;
-    barColor: string;
-    fullWidth?: boolean;
-}) {
-    return (
-        <div className={cn('bg-white rounded-2xl p-4 shadow-sm', fullWidth ? 'col-span-2' : '')}>
-            <div className="flex items-center gap-1.5 mb-1">
-                <span className={cn('w-5 h-5 flex items-center justify-center rounded', iconBg)}>{icon}</span>
-                <span className="text-xs text-gray-500">{label}</span>
-            </div>
-            <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-2xl font-bold text-gray-900">{value}</span>
-                {target !== undefined && (
-                    <span className="text-sm text-gray-400">/ {target}</span>
-                )}
-            </div>
-            <ProgressBar value={typeof value === 'number' ? value : 80} target={target} color={barColor} />
-        </div>
-    );
-}
-
-// ─── 主页面 ────────────────────────────────────────────────────────────────────
+import {
+    Menu,
+    Calendar,
+    UserPlus,
+    TrendingUp,
+    Banknote,
+    AlarmClockOff,
+    Phone,
+    Lightbulb
+} from 'lucide-react';
 
 export default function DataDashboard() {
     const navigate = useNavigate();
-    const [period, setPeriod] = useState<Period>('日');
-    const [metric, setMetric] = useState('报名人数');
-    const [showMetricDropdown, setShowMetricDropdown] = useState(false);
-
-    const chart = chartData[period];
-    const stats = metricData[period];
+    const [activeFilter, setActiveFilter] = useState('');
+    const [activeTab, setActiveTab] = useState('最近7天');
 
     return (
-        <div className="min-h-screen bg-[#F5F6FA] pb-8">
-            {/* 顶部导航栏 */}
+        <div className="min-h-screen bg-[#F8F9FD] pb-8 font-sans">
+            {/* 顶部导航 */}
             <div className="flex items-center justify-between px-4 pt-6 pb-4">
-                <button onClick={() => navigate(-1)} className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                    <ArrowLeft size={20} className="text-gray-700" />
+                <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-gray-100 transition-colors">
+                    <Menu size={24} className="text-violet-600" />
                 </button>
-                <h1 className="text-xl font-bold text-gray-900">数据看板</h1>
-                <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                    <MoreVertical size={20} className="text-gray-700" />
-                </button>
+                <h1 className="text-lg font-bold text-gray-900 tracking-wider">数据报表</h1>
+                <div className="w-8"></div> {/* Placeholder for right-alignment */}
             </div>
 
-            {/* 周期切换 Tab */}
-            <div className="px-4 mb-4">
-                <div className="flex bg-white rounded-2xl shadow-sm p-1">
-                    {(['日', '周', '月'] as Period[]).map((p) => (
+            {/* 日期选择器 & 过滤器 */}
+            <div className="px-4 mb-5">
+                <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-stretch">
+                    <div className="bg-white rounded-2xl px-3 py-2.5 flex items-center gap-3 border border-gray-100/50 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.05)]">
+                        <Calendar size={16} className="text-violet-300" />
+                        <div className="flex items-center justify-center gap-1.5 flex-1 min-w-0">
+                            <span className="text-xs font-bold text-gray-800 tracking-tight whitespace-nowrap">2025-10-27</span>
+                            <span className="text-gray-300 transform scale-y-150 inline-block">~</span>
+                            <span className="text-xs font-bold text-gray-800 tracking-tight whitespace-nowrap">2025-11-02</span>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => { setActiveFilter('一键整周'); setActiveTab(''); }}
+                        className={`rounded-2xl px-3.5 py-2.5 text-xs font-medium shadow-[0_2px_8px_-4px_rgba(0,0,0,0.05)] whitespace-nowrap transition-colors border ${activeFilter === '一键整周'
+                            ? 'bg-violet-600 text-white border-violet-600'
+                            : 'bg-white text-violet-600 border-violet-100 hover:bg-violet-50'
+                            }`}
+                    >
+                        一键整周
+                    </button>
+                    <button
+                        onClick={() => { setActiveFilter('一键整月'); setActiveTab(''); }}
+                        className={`rounded-2xl px-3.5 py-2.5 text-xs font-medium shadow-[0_2px_8px_-4px_rgba(0,0,0,0.05)] whitespace-nowrap transition-colors border ${activeFilter === '一键整月'
+                            ? 'bg-violet-600 text-white border-violet-600'
+                            : 'bg-white text-violet-600 border-violet-100 hover:bg-violet-50'
+                            }`}
+                    >
+                        一键整月
+                    </button>
+                </div>
+
+                {/* 时间跨度筛选项 */}
+                <div className="flex gap-2.5 mt-4">
+                    {['最近7天', '最近30天', '最近100天'].map((tab) => (
                         <button
-                            key={p}
-                            onClick={() => setPeriod(p)}
-                            className={cn(
-                                'flex-1 py-2 text-sm font-medium rounded-xl transition-all',
-                                period === p
-                                    ? 'bg-white text-gray-900 font-bold shadow-sm border border-gray-100'
-                                    : 'text-gray-400'
-                            )}
+                            key={tab}
+                            onClick={() => { setActiveTab(tab); setActiveFilter(''); }}
+                            className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors border ${activeTab === tab
+                                ? 'bg-violet-600 text-white border-violet-600 shadow-sm'
+                                : 'bg-white text-gray-500 border-gray-100 hover:bg-gray-50'
+                                }`}
                         >
-                            {p}
+                            {tab}
                         </button>
                     ))}
                 </div>
             </div>
 
-            <div className="px-4 space-y-3">
-                {/* 指标趋势图 */}
-                <div className="bg-white rounded-2xl p-4 shadow-sm">
-                    <div className="flex items-center justify-between mb-3">
-                        <span className="font-bold text-gray-900 text-sm">指标趋势</span>
-                        {/* 下拉筛选 */}
-                        <div className="relative">
-                            <button
-                                onClick={() => setShowMetricDropdown(v => !v)}
-                                className="flex items-center gap-1 text-sm text-gray-600 bg-gray-50 px-3 py-1 rounded-full"
-                            >
-                                {metric}
-                                <ChevronDown size={14} className={cn('transition-transform', showMetricDropdown && 'rotate-180')} />
-                            </button>
-                            {showMetricDropdown && (
-                                <div className="absolute right-0 top-full mt-1 w-32 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden py-1 z-10">
-                                    {METRIC_OPTIONS.map((opt) => (
-                                        <button
-                                            key={opt}
-                                            onClick={() => { setMetric(opt); setShowMetricDropdown(false); }}
-                                            className={cn(
-                                                'w-full text-left px-4 py-2 text-sm transition-colors',
-                                                metric === opt ? 'bg-violet-50 text-violet-600 font-medium' : 'text-gray-700 hover:bg-gray-50'
-                                            )}
-                                        >
-                                            {opt}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                    <BarChart data={chart} animKey={period} />
-                </div>
-
-                {/* 指标卡片 2×2 网格 */}
-                <div className="grid grid-cols-2 gap-3">
-                    <MetricCard
-                        icon={<Users size={12} className="text-violet-500" />}
-                        iconBg="bg-violet-50"
-                        label="报名人数"
-                        value={stats.signups.value}
-                        target={stats.signups.target}
-                        barColor="bg-violet-500"
-                    />
-                    <MetricCard
-                        icon={<DollarSign size={12} className="text-green-500" />}
-                        iconBg="bg-green-50"
-                        label="现金"
-                        value={stats.cash.value}
-                        target={stats.cash.target}
-                        barColor="bg-green-500"
-                    />
-                    <MetricCard
-                        icon={<BookOpen size={12} className="text-blue-500" />}
-                        iconBg="bg-blue-50"
-                        label="跟进人数"
-                        value={stats.followUps.value}
-                        target={stats.followUps.target}
-                        barColor="bg-blue-500"
-                    />
-                    <MetricCard
-                        icon={<Footprints size={12} className="text-amber-500" />}
-                        iconBg="bg-amber-50"
-                        label="上门人数"
-                        value={stats.visits.value}
-                        target={stats.visits.target}
-                        barColor="bg-amber-400"
-                    />
-                </div>
-
-                {/* 已超时 - 全宽 */}
-                <div className="bg-white rounded-2xl p-4 shadow-sm relative">
-                    {/* 红色小圆点 */}
-                    <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full" />
-                    <div className="flex items-center gap-1.5 mb-1">
-                        <span className="w-5 h-5 flex items-center justify-center rounded bg-red-50">
-                            <AlertTriangle size={12} className="text-red-500" />
-                        </span>
-                        <span className="text-xs text-gray-500">已超时</span>
-                    </div>
-                    <div className="flex items-baseline gap-1 mt-1">
-                        <span className="text-2xl font-bold text-red-500">{stats.overdue.value}</span>
-                        {stats.overdue.target !== undefined && (
-                            <span className="text-sm text-gray-400">/ {stats.overdue.target}</span>
-                        )}
-                    </div>
-                    <div className="w-full h-1.5 bg-gray-100 rounded-full mt-2">
-                        <div
-                            className="h-1.5 rounded-full bg-red-500"
-                            style={{
-                                width: stats.overdue.target
-                                    ? `${Math.min((stats.overdue.value / stats.overdue.target) * 100, 100)}%`
-                                    : '80%'
-                            }}
-                        />
-                    </div>
-                </div>
-
+            <div className="px-4 space-y-4">
                 {/* 智能建议 */}
-                <div className="bg-violet-50 rounded-2xl p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                        <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center">
-                            <Lightbulb size={16} className="text-white" />
+                <div className="relative bg-[#FAEDFF] rounded-2xl p-4 overflow-hidden mt-2">
+                    {/* 渐变装饰背景 */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-violet-200/50 to-fuchsia-200/50 blur-2xl rounded-full -mr-10 -mt-10 pointer-events-none"></div>
+                    <div className="relative flex gap-3 items-start">
+                        <div className="w-9 h-9 rounded-[10px] bg-[#9333EA] flex items-center justify-center shrink-0 shadow-sm">
+                            <Lightbulb size={18} className="text-white fill-white" />
                         </div>
-                        <span className="font-bold text-violet-800 text-sm">智能建议</span>
+                        <div className="flex-1">
+                            <div className="font-bold text-[#7E22CE] text-sm mb-1">智能建议</div>
+                            <p className="text-xs text-[#9333EA]/80 leading-relaxed font-medium">
+                                本月报名人数已达成<span className="font-extrabold text-[#7E22CE]">90%</span>，建议优先跟进近期有上门记录的高意向客户。
+                            </p>
+                        </div>
                     </div>
-                    <p className="text-xs text-violet-700 leading-relaxed mb-3">
-                        {stats.advice}
-                    </p>
-                    <button className="text-violet-600 text-xs font-bold flex items-center gap-1">
-                        立即处理 →
-                    </button>
+                </div>
+
+                {/* 报名人数 */}
+                <div className="bg-white rounded-[1.25rem] p-5 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.05)]">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <div className="text-gray-500 text-[13px] mb-1.5 font-medium">报名人数</div>
+                            <div className="text-[32px] leading-none font-extrabold text-[#7C3AED] tracking-tight">54</div>
+                        </div>
+                        <div className="w-11 h-11 rounded-2xl bg-violet-100/50 flex items-center justify-center">
+                            <UserPlus size={22} className="text-[#8B5CF6]" strokeWidth={2.5} />
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2 mt-5">
+                        <div className="bg-emerald-50 text-emerald-500 text-[10px] font-extrabold px-1.5 py-0.5 rounded-[4px] flex items-center gap-0.5 leading-none tracking-tighter">
+                            <TrendingUp size={10} strokeWidth={3} />
+                            12.5%
+                        </div>
+                        <div className="text-gray-400 text-[11px] italic tracking-wide">本月目标已达成 90%</div>
+                    </div>
+                </div>
+
+                {/* 现金 */}
+                <div className="bg-white rounded-[1.25rem] p-5 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.05)]">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <div className="text-gray-500 text-[13px] mb-1.5 font-medium">现金</div>
+                            <div className="text-[32px] leading-none font-extrabold text-gray-900 tracking-tight">88k</div>
+                        </div>
+                        <div className="w-11 h-11 rounded-2xl bg-[#ECFDF5] flex items-center justify-center">
+                            <Banknote size={22} className="text-[#10B981]" strokeWidth={2.5} />
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2 mt-5">
+                        <div className="bg-emerald-50 text-emerald-500 text-[10px] font-extrabold px-1.5 py-0.5 rounded-[4px] flex items-center gap-0.5 leading-none tracking-tighter">
+                            <TrendingUp size={10} strokeWidth={3} />
+                            8.2%
+                        </div>
+                        <div className="text-gray-400 text-[11px] italic tracking-wide">已达成月度目标 64%</div>
+                    </div>
+                </div>
+
+                {/* 数据网格卡片 */}
+                <div className="grid grid-cols-2 gap-3">
+                    {[
+                        { label: '跟进人数', value: '72', colorClass: 'text-gray-900' },
+                        { label: '上门人数', value: '32', colorClass: 'text-gray-900' },
+                        { label: '进班人数', value: '40', colorClass: 'text-gray-900' },
+                        { label: '退费人数', value: '3', colorClass: 'text-[#F97316]' },
+                        { label: '引流产品签约数', value: '150', colorClass: 'text-[#7C3AED]' },
+                        { label: '零暑期课目标', value: '65', colorClass: 'text-[#06B6D4]' },
+                        { label: '口碑转介介绍数', value: '8', colorClass: 'text-[#F43F5E]' },
+                    ].map((item, index) => (
+                        <div key={index} className="bg-white rounded-2xl p-4 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.04)]">
+                            <div className="text-gray-500 text-[11px] mb-2 font-medium">{item.label}</div>
+                            <div className={`text-xl font-extrabold ${item.colorClass}`}>{item.value}</div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* 已超时人数 */}
+                <div className="bg-[#FFF1F2] border border-[#FFE4E6] rounded-[1.25rem] px-5 py-4 shadow-sm flex items-center justify-between mt-2">
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-[#FFE4E6] flex items-center justify-center">
+                            <AlarmClockOff size={18} className="text-[#E11D48]" strokeWidth={2.5} />
+                        </div>
+                        <div className="text-[#9F1239] font-bold text-sm">已超时人数</div>
+                    </div>
+                    <div className="text-[26px] font-extrabold text-[#E11D48] tracking-tight">89</div>
+                </div>
+
+                {/* 呼叫分析 */}
+                <div className="bg-white rounded-[1.25rem] p-5 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.04)] mt-2">
+                    <div className="flex items-center gap-2.5 mb-5">
+                        <Phone size={18} className="text-[#8B5CF6] fill-[#8B5CF6]" strokeWidth={2} />
+                        <div className="font-bold text-gray-900 text-[15px]">呼叫分析</div>
+                    </div>
+
+                    <div className="flex justify-between items-end mb-6 border-b border-gray-50 pb-4">
+                        <div className="text-gray-500 text-xs font-medium">呼出总数</div>
+                        <div className="font-extrabold text-gray-900 text-sm">46</div>
+                    </div>
+
+                    <div className="flex justify-between items-center px-1">
+                        <div className="flex flex-col items-center">
+                            <div className="text-xl font-extrabold text-[#10B981] mb-1.5 tracking-tight">45</div>
+                            <div className="text-gray-400 text-[10px] font-medium">接通</div>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <div className="text-xl font-extrabold text-gray-900 mb-1.5 tracking-tight">12</div>
+                            <div className="text-gray-400 text-[10px] font-medium">&gt;70S</div>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <div className="text-xl font-extrabold text-gray-900 mb-1.5 tracking-tight">15</div>
+                            <div className="text-gray-400 text-[10px] font-medium">&gt;120S</div>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <div className="text-xl font-extrabold text-[#7C3AED] mb-1.5 tracking-tight">82:17</div>
+                            <div className="text-gray-400 text-[10px] font-medium">总长</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
