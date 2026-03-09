@@ -48,7 +48,7 @@ export default function CustomerDetail() {
         </div>
 
         {/* Main Profile Card */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm relative overflow-hidden">
+        <div className="bg-white rounded-2xl p-5 shadow-sm relative">
           <div className="flex justify-between items-start">
             <div className="flex gap-4">
               <div className="relative">
@@ -92,7 +92,7 @@ export default function CustomerDetail() {
             </button>
           </div>
 
-          <div className="flex justify-between items-start mt-6 pt-4 border-t border-gray-50 gap-2">
+          <div className="flex justify-between items-start mt-6 pt-4 border-t border-gray-50 gap-2 relative z-50">
             <div className="flex-[1.2] min-w-0">
               <div className="flex items-center text-[10px] text-gray-400 mb-1">
                 产品线 <HelpCircle size={10} className="ml-1 shrink-0" />
@@ -103,7 +103,10 @@ export default function CustomerDetail() {
               </div>
             </div>
             <div className="flex-[1.5] min-w-0">
-              <div className="text-[10px] text-gray-400 mb-1">渠道来源</div>
+              <div className="text-[10px] text-gray-400 mb-1 flex items-center">
+                渠道来源
+                <SourceExpandBadge />
+              </div>
               <div className="text-xs font-medium text-gray-800 truncate">线上营销-美团-抖音</div>
             </div>
             <div className="flex-1 min-w-0 text-center">
@@ -618,6 +621,41 @@ function CallPlayer({ duration, status }: { duration: string; status: string }) 
               {status}
             </span>
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SourceExpandBadge() {
+  const [expanded, setExpanded] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!expanded) return;
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setExpanded(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [expanded]);
+
+  return (
+    <div className="relative inline-flex items-center ml-2" ref={containerRef}>
+      <span
+        onClick={() => setExpanded(v => !v)}
+        className="inline-flex items-center gap-0.5 bg-orange-50 text-orange-500 px-1.5 py-0.5 rounded-full cursor-pointer hover:bg-orange-100 transition-colors"
+      >
+        <HelpCircle size={10} />
+        <span>拓展</span>
+      </span>
+      {expanded && (
+        <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-gray-100 p-1.5 z-20 w-28">
+          <div className="text-xs text-gray-700 py-2.5 px-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">美团-团购</div>
+          <div className="text-xs text-gray-700 py-2.5 px-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">抖音-直播</div>
+          <div className="text-xs text-gray-700 py-2.5 px-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">大众点评</div>
         </div>
       )}
     </div>
