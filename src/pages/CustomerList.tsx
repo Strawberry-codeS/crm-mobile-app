@@ -114,28 +114,22 @@ export default function CustomerList() {
         <div className="w-[88px] invisible"></div>
       </div>
 
-      {/* Search and Filter */}
-      <div className="flex space-x-2 mb-4">
-        <div className="relative flex-1">
+      {/* Search */}
+      <div className="mb-4">
+        <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
           <input
             type="text"
             value={searchTerm}
             onChange={e => handleSearch(e.target.value)}
             placeholder="搜索客户姓名、手机号"
-            className="w-full bg-white rounded-full py-3.5 pl-11 pr-4 text-sm shadow-sm focus:outline-none border border-transparent focus:border-violet-200"
+            className="w-full bg-gray-50 rounded-full py-3.5 pl-11 pr-4 text-sm focus:outline-none border border-transparent focus:border-violet-200"
           />
         </div>
-        <button
-          onClick={() => setShowFilter(true)}
-          className="flex items-center justify-center text-violet-600 bg-white px-5 py-3.5 rounded-full shadow-sm shrink-0 border border-transparent active:bg-violet-50 font-bold text-sm transition-colors"
-        >
-          <Filter size={16} className="mr-1.5" /> 筛选
-        </button>
       </div>
 
       {/* Tabs */}
-      <div className="mb-4 border-b border-gray-100">
+      <div className="mb-3 border-b border-gray-100 pb-1">
         <div
           ref={scrollRef}
           className="flex space-x-6 px-2 overflow-x-auto no-scrollbar touch-pan-x cursor-grab active:cursor-grabbing select-none"
@@ -156,11 +150,24 @@ export default function CustomerList() {
             >
               {tab}
               {activeTab === tab && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-violet-600 rounded-full" />
+                <div className="absolute -bottom-[5px] left-0 right-0 h-0.5 bg-violet-600 rounded-full" />
               )}
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Filter Row */}
+      <div className="flex justify-between items-center mb-4 px-2">
+        <div className="text-gray-400 text-sm">
+          {activeTab} ({customers.length})
+        </div>
+        <button
+          onClick={() => setShowFilter(true)}
+          className="flex items-center justify-center text-violet-600 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100 active:bg-violet-50 font-medium text-sm transition-colors"
+        >
+          <Filter size={14} className="mr-1.5" /> 筛选
+        </button>
       </div>
 
       {/* Secondary Filters removed per user request */}
