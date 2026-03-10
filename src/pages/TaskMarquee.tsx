@@ -23,10 +23,10 @@ const TaskMarquee: React.FC<TaskMarqueeProps> = ({ taskText }) => {
     <span className="text-xs text-orange-500 font-bold">
       {/* 保留你要的 text-orange-400 样式，一丝不改 */}
       <span className="text-orange-400 mr-1">当前任务:</span>
-      
+
       {/* 只给后面的任务文字加滚动效果，样式和原有一致 */}
       <div className="inline-block relative h-4 overflow-hidden align-middle">
-        <div 
+        <div
           className="transition-transform duration-500 ease-in-out"
           style={{ transform: `translateY(-${currentIndex * 100}%)` }}
         >

@@ -12,6 +12,7 @@ export default function CustomerDetail() {
 
   const [activeStudentIndex, setActiveStudentIndex] = useState(0);
   const [showAddPhoneModal, setShowAddPhoneModal] = useState(false);
+  const [activeStageModal, setActiveStageModal] = useState<'none' | 'demo' | 'visit' | 'enrollment'>('none');
   const activeStudent = students[activeStudentIndex];
 
   const profile = {
@@ -126,15 +127,24 @@ export default function CustomerDetail() {
             <CheckCircle size={16} className="mr-1" /> 接触阶段
           </div>
           <div className="h-px w-8 bg-violet-200"></div>
-          <div className="flex items-center text-violet-600 font-bold">
+          <div
+            className="flex items-center text-violet-600 font-bold cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => setActiveStageModal('demo')}
+          >
             <div className="w-4 h-4 rounded-full bg-violet-600 mr-1"></div> 邀约demo
           </div>
           <div className="h-px w-8 bg-gray-200"></div>
-          <div className="flex items-center text-gray-400">
-            <div className="w-2 h-2 rounded-full bg-gray-300 mr-2"></div> 已到访
+          <div
+            className="flex items-center text-gray-400 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => setActiveStageModal('visit')}
+          >
+            <div className="w-2 h-2 rounded-full bg-gray-300 mr-2"></div> 已上门
           </div>
           <div className="h-px w-8 bg-gray-200"></div>
-          <div className="flex items-center text-gray-400">
+          <div
+            className="flex items-center text-gray-400 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => setActiveStageModal('enrollment')}
+          >
             <div className="w-2 h-2 rounded-full bg-gray-300 mr-2"></div> 正式报名
           </div>
         </div>
@@ -215,6 +225,46 @@ export default function CustomerDetail() {
       </div>
 
       {showAddPhoneModal && <AddPhoneModal onClose={() => setShowAddPhoneModal(false)} />}
+
+      {/* Stage Modals */}
+      <StageConfirmModal
+        isOpen={activeStageModal === 'demo'}
+        onClose={() => setActiveStageModal('none')}
+        title={<span>是否将 <span className="font-bold">客户阶段</span> 调整为 <span className="font-bold">已邀约demo</span></span>}
+        subTitle="(同步将用户标签更新为承诺上门)"
+        onConfirm={() => { }}
+      />
+
+      <StageConfirmModal
+        isOpen={activeStageModal === 'visit'}
+        onClose={() => setActiveStageModal('none')}
+        title={<span>是否将 <span className="font-bold">客户阶段</span> 调整为 <span className="font-bold">已上门</span></span>}
+        subTitle="(同步将用户标签更新为已上门)"
+        onConfirm={() => { }}
+      />
+
+      <StageConfirmModal
+        isOpen={activeStageModal === 'enrollment'}
+        onClose={() => setActiveStageModal('none')}
+        title="正式报名状态会在客户签署合同后自动同步"
+        onConfirm={() => { }}
+        customButtons={
+          <>
+            <button
+              onClick={() => setActiveStageModal('none')}
+              className="flex-1 py-3 bg-violet-600 text-white font-medium rounded-full shadow-md shadow-violet-200 hover:bg-violet-700 transition-colors text-sm"
+            >
+              确认
+            </button>
+            <button
+              onClick={() => setActiveStageModal('none')}
+              className="flex-1 py-3 bg-[#c4a5ff] text-white font-medium rounded-full hover:bg-violet-400 transition-colors text-sm"
+            >
+              建合同
+            </button>
+          </>
+        }
+      />
     </div>
   );
 }
@@ -263,6 +313,73 @@ function AddPhoneModal({ onClose }: { onClose: () => void }) {
           >
             确认添加
           </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StageConfirmModal({
+  isOpen,
+  onClose,
+  title,
+  subTitle,
+  onConfirm,
+  confirmText = "确认",
+  cancelText = "取消",
+  customButtons,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  title: React.ReactNode;
+  subTitle?: string;
+  onConfirm: () => void;
+  confirmText?: string;
+  cancelText?: string;
+  customButtons?: React.ReactNode;
+}) {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center px-4">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onClick={onClose}></div>
+      <div className="bg-white rounded-[2rem] w-full max-w-[320px] p-8 animate-in zoom-in-95 duration-200 relative z-10 shadow-xl flex flex-col items-center">
+        {/* Info Icon */}
+        <div className="w-12 h-12 bg-violet-600 rounded-full flex items-center justify-center mb-6">
+          <span className="text-white font-serif text-[28px] italic -mt-1 font-medium">i</span>
+        </div>
+
+        {/* Title */}
+        <div className="text-violet-600 text-[15px] mb-2 w-full flex justify-center whitespace-nowrap">
+          {title}
+        </div>
+
+        {/* Subtitle */}
+        {subTitle && (
+          <div className="text-[#a1a1aa] text-xs mb-8 w-full flex justify-center">
+            {subTitle}
+          </div>
+        )}
+
+        {/* Buttons */}
+        <div className="flex gap-3 w-full mt-2">
+          {customButtons ? (
+            customButtons
+          ) : (
+            <>
+              <button
+                onClick={onClose}
+                className="flex-1 py-3 text-gray-500 font-medium hover:bg-gray-50 rounded-full transition-colors text-sm"
+              >
+                {cancelText}
+              </button>
+              <button
+                onClick={() => { onConfirm(); onClose(); }}
+                className="flex-1 py-3 bg-violet-600 text-white font-medium rounded-full shadow-md shadow-violet-200 hover:bg-violet-700 transition-colors text-sm"
+              >
+                {confirmText}
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
