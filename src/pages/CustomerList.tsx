@@ -1,4 +1,4 @@
-﻿import { Search, Filter, Phone, MessageSquare, ChevronDown, X, Calendar } from 'lucide-react';
+﻿import { Search, Filter, Phone, MessageSquare, ChevronDown, X, Calendar, MapPin } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -10,6 +10,10 @@ export default function CustomerList() {
   const [showFilter, setShowFilter] = useState(false);
   const [activeTab, setActiveTab] = useState('全部客户');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isCampusDropdownOpen, setIsCampusDropdownOpen] = useState(false);
+  const [selectedCampus, setSelectedCampus] = useState('大悦城校区');
+
+  const campuses = ['大悦城校区', '广渠门校区'];
 
   const tabs = ['全部客户', '新分配客户', '待继续跟进', '待上门试听', '重点客户'];
 
@@ -33,31 +37,60 @@ export default function CustomerList() {
   return (
     <div className="p-4 h-full flex flex-col relative">
       {/* Header */}
-      <div className="flex justify-between items-center py-2 mb-2">
-        <div className="flex items-center space-x-2">
-          <ChevronDown className="text-gray-900" />
-          <h1 className="text-xl font-bold text-gray-900">客户</h1>
-        </div>
-        <div className="flex space-x-2">
+      <div className="flex justify-between items-center py-2 mb-2 relative z-50">
+        <div className="relative">
           <button
-            onClick={() => setShowFilter(true)}
-            className="flex items-center text-sm text-violet-600 bg-white px-3 py-1.5 rounded-full shadow-sm"
+            onClick={() => setIsCampusDropdownOpen(!isCampusDropdownOpen)}
+            className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full shadow-sm border border-gray-100"
           >
-            <Filter size={14} className="mr-1" /> 筛选
+            <MapPin size={14} className="text-violet-600" />
+            <span className="text-xs font-medium text-gray-700 max-w-[80px] truncate">{selectedCampus}</span>
+            <ChevronDown size={12} className="text-gray-400" />
           </button>
+
+          {/* Dropdown Menu */}
+          {isCampusDropdownOpen && (
+            <div className="absolute top-full left-0 mt-1 w-36 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden py-1">
+              {campuses.map(campus => (
+                <button
+                  key={campus}
+                  onClick={() => {
+                    setSelectedCampus(campus);
+                    setIsCampusDropdownOpen(false);
+                  }}
+                  className={cn(
+                    "w-full text-left px-4 py-2 text-sm transition-colors",
+                    selectedCampus === campus ? "bg-violet-50 text-violet-600 font-medium" : "text-gray-700 hover:bg-gray-50"
+                  )}
+                >
+                  {campus}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
+        <h1 className="text-xl font-bold text-gray-900 absolute left-1/2 -translate-x-1/2">客户</h1>
+        <div className="w-[88px] invisible"></div>
       </div>
 
-      {/* Search */}
-      <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={e => handleSearch(e.target.value)}
-          placeholder="搜索客户姓名、手机号"
-          className="w-full bg-white rounded-full py-3 pl-10 pr-4 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-100"
-        />
+      {/* Search and Filter */}
+      <div className="flex space-x-2 mb-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={e => handleSearch(e.target.value)}
+            placeholder="搜索客户姓名、手机号"
+            className="w-full bg-white rounded-full py-3.5 pl-11 pr-4 text-sm shadow-sm focus:outline-none border border-transparent focus:border-violet-200"
+          />
+        </div>
+        <button
+          onClick={() => setShowFilter(true)}
+          className="flex items-center justify-center text-violet-600 bg-white px-5 py-3.5 rounded-full shadow-sm shrink-0 border border-transparent active:bg-violet-50 font-bold text-sm transition-colors"
+        >
+          <Filter size={16} className="mr-1.5" /> 筛选
+        </button>
       </div>
 
       {/* Tabs */}
