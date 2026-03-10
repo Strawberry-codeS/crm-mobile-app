@@ -1,6 +1,6 @@
 ﻿import { Search, Filter, Phone, MessageSquare, ChevronDown, X, Calendar, MapPin } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useCustomers } from '@/hooks/useCustomers';
 import type { Customer as CustomerData } from '@/lib/supabase';
@@ -23,6 +23,47 @@ export default function CustomerList() {
   const handleSearch = (q: string) => {
     setSearchTerm(q);
     search(q);
+  };
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
+  const dragged = useRef(false);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    isDragging.current = true;
+    dragged.current = false;
+    if (!scrollRef.current) return;
+    startX.current = e.pageX - scrollRef.current.offsetLeft;
+    scrollLeft.current = scrollRef.current.scrollLeft;
+  };
+
+  const handleMouseLeave = () => {
+    isDragging.current = false;
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current || !scrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX.current) * 2;
+    if (Math.abs(walk) > 5) {
+      dragged.current = true;
+    }
+    scrollRef.current.scrollLeft = scrollLeft.current - walk;
+  };
+
+  const handleTabClick = (tab: string, e: React.MouseEvent) => {
+    if (dragged.current) {
+      e.preventDefault();
+      return;
+    }
+    setActiveTab(tab);
   };
 
   function buildInfo(c: CustomerData): string {
@@ -95,11 +136,19 @@ export default function CustomerList() {
 
       {/* Tabs */}
       <div className="mb-4 border-b border-gray-100">
-        <div className="flex space-x-6 px-2 overflow-x-auto no-scrollbar touch-pan-x" style={{ WebkitOverflowScrolling: 'touch' }}>
+        <div
+          ref={scrollRef}
+          className="flex space-x-6 px-2 overflow-x-auto no-scrollbar touch-pan-x cursor-grab active:cursor-grabbing select-none"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseLeave}
+          onMouseUp={handleMouseUp}
+          onMouseMove={handleMouseMove}
+        >
           {tabs.map(tab => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={(e) => handleTabClick(tab, e)}
               className={cn(
                 "pb-2 font-medium whitespace-nowrap transition-colors relative flex-shrink-0",
                 activeTab === tab ? "text-violet-600 font-bold" : "text-gray-400"
