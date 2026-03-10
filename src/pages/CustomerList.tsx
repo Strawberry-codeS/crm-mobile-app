@@ -94,22 +94,24 @@ export default function CustomerList() {
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-6 mb-4 border-b border-gray-100 px-2 overflow-x-auto no-scrollbar">
-        {tabs.map(tab => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={cn(
-              "pb-2 font-medium whitespace-nowrap transition-colors relative",
-              activeTab === tab ? "text-violet-600 font-bold" : "text-gray-400"
-            )}
-          >
-            {tab}
-            {activeTab === tab && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-violet-600 rounded-full" />
-            )}
-          </button>
-        ))}
+      <div className="mb-4 border-b border-gray-100">
+        <div className="flex space-x-6 px-2 overflow-x-auto no-scrollbar touch-pan-x" style={{ WebkitOverflowScrolling: 'touch' }}>
+          {tabs.map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={cn(
+                "pb-2 font-medium whitespace-nowrap transition-colors relative flex-shrink-0",
+                activeTab === tab ? "text-violet-600 font-bold" : "text-gray-400"
+              )}
+            >
+              {tab}
+              {activeTab === tab && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-violet-600 rounded-full" />
+              )}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Secondary Filters removed per user request */}
