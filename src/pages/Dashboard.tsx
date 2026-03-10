@@ -219,15 +219,7 @@ export default function Dashboard() {
         </Link>
       </div>
 
-      {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-        <input
-          type="text"
-          placeholder="搜索今日待办客户"
-          className="w-full bg-white rounded-2xl py-4 pl-12 pr-4 text-sm shadow-sm focus:outline-none text-gray-600 placeholder-gray-400"
-        />
-      </div>
+
 
       {/* Execution Progress */}
       <div className="space-y-4">
