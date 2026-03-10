@@ -117,13 +117,13 @@ export default function CustomerList() {
       {/* Search */}
       <div className="mb-4">
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-violet-400" size={18} />
           <input
             type="text"
             value={searchTerm}
             onChange={e => handleSearch(e.target.value)}
             placeholder="搜索客户姓名、手机号"
-            className="w-full bg-gray-50 rounded-full py-3.5 pl-11 pr-4 text-sm focus:outline-none border border-transparent focus:border-violet-200"
+            className="w-full bg-white rounded-full py-3 pl-11 pr-4 text-sm focus:outline-none border-2 border-violet-100 focus:border-violet-200 text-gray-700 placeholder-gray-400"
           />
         </div>
       </div>
