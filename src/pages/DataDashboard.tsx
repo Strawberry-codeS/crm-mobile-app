@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    Menu,
     Calendar,
     UserPlus,
     TrendingUp,
@@ -20,8 +19,11 @@ export default function DataDashboard() {
         <div className="min-h-screen bg-[#F8F9FD] pb-8 font-sans">
             {/* 顶部导航 */}
             <div className="flex items-center justify-between px-4 pt-6 pb-4">
-                <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-gray-100 transition-colors">
-                    <Menu size={24} className="text-violet-600" />
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center gap-1 -ml-2 p-2 rounded-full hover:bg-gray-100 transition-colors text-[#7C3AED] font-bold text-lg"
+                >
+                    <span className="text-2xl leading-none -mt-1">&lt;</span> 返回
                 </button>
                 <h1 className="text-lg font-bold text-gray-900 tracking-wider">数据报表</h1>
                 <div className="w-8"></div> {/* Placeholder for right-alignment */}
