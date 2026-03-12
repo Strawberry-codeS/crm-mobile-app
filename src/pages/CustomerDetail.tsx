@@ -830,65 +830,150 @@ function Tag({ children, active }: any) {
 
 function PriorityCard() {
   const [expanded, setExpanded] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
   return (
-    <div className="rounded-xl border border-orange-100 bg-orange-50 overflow-hidden select-none">
-      {/* Content area with left icon */}
-      <div className="flex gap-2.5 px-3 pt-3">
-        {/* Left orange question mark icon */}
-        <div className="flex-shrink-0 mt-0.5">
-          <HelpCircle className="text-orange-400" size={20} />
-        </div>
-
-        {/* Text rows */}
-        <div className="flex-1 min-w-0">
-          <p className={`text-xs leading-5 ${expanded ? 'text-gray-600' : 'truncate text-gray-600'}`}>
-            <span className="font-bold">【重点理由】</span>刚才在直播间购买了体验课，之前还看了两条课程视频，停在价格页超过3分钟。25分钟前刚发生。
-          </p>
-          <p className={`text-xs leading-5 mt-0.5 ${expanded ? 'text-gray-600' : 'truncate text-gray-600'}`}>
-            <span className="font-bold">【客户关注】</span>体验课怎么上 · 价格是否划算 · 上课地点方不方便
-          </p>
-
-          {/* 3rd row with bottom-up gradient fade when collapsed */}
-          <div className="relative mt-0.5">
-            <p className={`text-xs leading-5 text-gray-600 overflow-hidden ${!expanded ? 'truncate' : ''}`}>
-              <span className="font-bold">【建议开场】</span>「您好，我是瑞思的老师，看到您刚预约了体验课，想帮您确认一下上课时间——您方便说一下孩子几岁，这边给您安排最合适的班级。」
-            </p>
-            {/* Strong bottom-up gradient fade when collapsed */}
-            {!expanded && (
-              <div
-                className="absolute inset-x-0 bottom-0 h-5 pointer-events-none"
-                style={{ background: 'linear-gradient(to bottom, transparent, #FFF7ED)' }}
-              />
-            )}
+    <>
+      <div className="rounded-xl border border-orange-100 bg-orange-50 overflow-hidden select-none">
+        {/* Content area with left icon */}
+        <div className="flex gap-2.5 px-3 pt-3">
+          {/* Left orange question mark icon */}
+          <div className="flex-shrink-0 mt-0.5">
+            <HelpCircle className="text-orange-400" size={20} />
           </div>
 
-          {/* Extra content shown only when expanded */}
-          {expanded && (
-            <div className="mt-2 space-y-1.5">
-              <div className="border-t border-orange-100 pt-1.5">
-                <p className="text-xs text-gray-600 leading-5">
-                  <span className="font-bold text-orange-600">【注意】</span>她在意性价比，先别推年课，让她把体验课上了再说。
-                </p>
-              </div>
-              <div className="bg-white/70 rounded-lg p-2 border border-orange-100">
-                <p className="text-[11px] text-gray-500 leading-relaxed">
-                  📍 首联时补问：「孩子在哪所幼儿园/小学呢？我看看离哪个校区最近」——补录后系统自动更新等级。
-                </p>
-              </div>
+          {/* Text rows */}
+          <div className="flex-1 min-w-0">
+            <p className={`text-xs leading-5 ${expanded ? 'text-gray-600' : 'truncate text-gray-600'}`}>
+              <span className="font-bold">【重点理由】</span>刚才在直播间购买了体验课，之前还看了两条课程视频，停在价格页超过3分钟。25分钟前刚发生。
+            </p>
+            <p className={`text-xs leading-5 mt-0.5 ${expanded ? 'text-gray-600' : 'truncate text-gray-600'}`}>
+              <span className="font-bold">【客户关注】</span>体验课怎么上 · 价格是否划算 · 上课地点方不方便
+            </p>
+
+            {/* 3rd row with bottom-up gradient fade when collapsed */}
+            <div className="relative mt-0.5">
+              <p className={`text-xs leading-5 text-gray-600 overflow-hidden ${!expanded ? 'truncate' : ''}`}>
+                <span className="font-bold">【建议开场】</span>「您好，我是瑞思的老师，看到您刚预约了体验课，想帮您确认一下上课时间——您方便说一下孩子几岁，这边给您安排最合适的班级。」
+              </p>
+              {/* Strong bottom-up gradient fade when collapsed */}
+              {!expanded && (
+                <div
+                  className="absolute inset-x-0 bottom-0 h-5 pointer-events-none"
+                  style={{ background: 'linear-gradient(to bottom, transparent, #FFF7ED)' }}
+                />
+              )}
             </div>
-          )}
+
+            {/* Extra content shown only when expanded */}
+            {expanded && (
+              <div className="mt-2 space-y-2">
+                <div className="border-t border-orange-100 pt-1.5">
+                  <p className="text-xs text-gray-600 leading-5">
+                    <span className="font-bold text-orange-600">【注意】</span>她在意性价比，先别推年课，让她把体验课上了再说。
+                  </p>
+                </div>
+                <div className="border-t border-dashed border-gray-200 pt-1.5">
+                  <div className="bg-white/70 rounded-lg p-2.5 border border-orange-100 flex gap-2">
+                    <p className="text-[11px] text-gray-500 leading-relaxed flex-1">
+                      💡 首联时补问：「孩子在哪所幼儿园/小学呢？我看看离哪个校区最近」——补录后系统自动更新等级。
+                    </p>
+                    <div className="flex items-end shrink-0 gap-1.5 pb-0.5">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (navigator.clipboard) {
+                            navigator.clipboard.writeText("孩子在哪所幼儿园/小学呢？我看看离哪个校区最近");
+                          }
+                        }}
+                        className="px-3 py-1 bg-white border border-gray-200 rounded-md text-[11px] text-gray-600 font-medium hover:bg-gray-50 transition-colors shadow-sm"
+                      >
+                        复制
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowFeedbackModal(true);
+                        }}
+                        className="w-[26px] h-[26px] flex items-center justify-center rounded-full bg-violet-50 text-violet-500 border border-violet-100 hover:bg-violet-100 transition-colors"
+                      >
+                        <HelpCircle size={14} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Bottom center chevron toggle button */}
+        <div className="flex justify-center pb-2 pt-1.5">
+          <button
+            onClick={() => setExpanded(v => !v)}
+            className="flex items-center justify-center w-6 h-6 rounded-full bg-white/80 border border-orange-100 text-gray-400 hover:bg-white transition-colors"
+          >
+            {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+          </button>
         </div>
       </div>
+      
+      <FeedbackModal isOpen={showFeedbackModal} onClose={() => setShowFeedbackModal(false)} />
+    </>
+  );
+}
 
-      {/* Bottom center chevron toggle button */}
-      <div className="flex justify-center pb-2 pt-1.5">
-        <button
-          onClick={() => setExpanded(v => !v)}
-          className="flex items-center justify-center w-6 h-6 rounded-full bg-white/80 border border-orange-100 text-gray-400 hover:bg-white transition-colors"
-        >
-          {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-        </button>
+function FeedbackModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const [text, setText] = useState("");
+  
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center px-4">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onClick={onClose}></div>
+      <div className="bg-white rounded-[1.5rem] w-full max-w-[320px] pt-8 animate-in zoom-in-95 duration-200 relative z-10 shadow-xl flex flex-col items-center overflow-hidden">
+        
+        {/* Title */}
+        <div className="text-gray-900 text-[17px] font-bold mb-2 w-full flex justify-center whitespace-nowrap">
+          反馈话术不好用
+        </div>
+
+        {/* Subtitle */}
+        <div className="text-gray-500 text-xs mb-6 w-full flex justify-center">
+          告诉我们哪里不好，我们会努力改进
+        </div>
+
+        {/* Textarea */}
+        <div className="w-full px-5 mb-6">
+          <div className="bg-gray-50 rounded-xl p-3 relative h-28">
+            <textarea 
+              className="w-full h-full bg-transparent border-none text-sm placeholder:text-gray-400 focus:outline-none resize-none"
+              placeholder="请输入您觉得不好用的话术问题~"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              maxLength={300}
+            />
+            <div className="absolute bottom-2 right-3 text-[10px] text-gray-400">
+              {text.length}/300
+            </div>
+          </div>
+        </div>
+
+        {/* Dividers & Buttons */}
+        <div className="w-full border-t border-gray-100 flex">
+          <button
+            onClick={onClose}
+            className="flex-1 py-3.5 text-gray-500 font-medium text-[15px] border-r border-gray-100 hover:bg-gray-50 transition-colors"
+          >
+            取消
+          </button>
+          <button
+            onClick={onClose}
+            className="flex-1 py-3.5 text-violet-600 font-bold text-[15px] hover:bg-gray-50 transition-colors"
+          >
+            提交
+          </button>
+        </div>
       </div>
     </div>
   );
