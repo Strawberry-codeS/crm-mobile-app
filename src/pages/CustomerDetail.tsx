@@ -852,17 +852,36 @@ function PriorityCard() {
             </p>
 
             {/* 3rd row with bottom-up gradient fade when collapsed */}
-            <div className="relative mt-0.5">
-              <p className={`text-xs leading-5 text-gray-600 overflow-hidden ${!expanded ? 'truncate' : ''}`}>
-                <span className="font-bold">【建议开场】</span>「您好，我是瑞思的老师，看到您刚预约了体验课，想帮您确认一下上课时间——您方便说一下孩子几岁，这边给您安排最合适的班级。」
-              </p>
-              {/* Strong bottom-up gradient fade when collapsed */}
-              {!expanded && (
-                <div
-                  className="absolute inset-x-0 bottom-0 h-5 pointer-events-none"
-                  style={{ background: 'linear-gradient(to bottom, transparent, #FFF7ED)' }}
-                />
-              )}
+            <div className="relative mt-1.5">
+              <div className="bg-white/70 rounded-lg p-2.5 border border-orange-100 flex gap-2">
+                <p className={`text-xs leading-5 text-gray-600 flex-1 ${!expanded ? 'truncate' : ''}`}>
+                  <span className="font-bold">【建议开场】</span>「您好，我是瑞思的老师，看到您刚预约了体验课，想帮您确认一下上课时间——您方便说一下孩子几岁，这边给您安排最合适的班级。」
+                </p>
+                {expanded && (
+                  <div className="flex items-end shrink-0 gap-1.5 pb-0.5">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (navigator.clipboard) {
+                          navigator.clipboard.writeText("您好，我是瑞思的老师，看到您刚预约了体验课，想帮您确认一下上课时间——您方便说一下孩子几岁，这边给您安排最合适的班级。");
+                        }
+                      }}
+                      className="px-3 py-1 bg-white border border-gray-200 rounded-md text-[11px] text-gray-600 font-medium hover:bg-gray-50 transition-colors shadow-sm"
+                    >
+                      复制
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowFeedbackModal(true);
+                      }}
+                      className="w-[26px] h-[26px] flex items-center justify-center rounded-full bg-violet-50 text-violet-500 border border-violet-100 hover:bg-violet-100 transition-colors"
+                    >
+                      <HelpCircle size={14} />
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Extra content shown only when expanded */}
@@ -872,35 +891,6 @@ function PriorityCard() {
                   <p className="text-xs text-gray-600 leading-5">
                     <span className="font-bold text-orange-600">【注意】</span>她在意性价比，先别推年课，让她把体验课上了再说。
                   </p>
-                </div>
-                <div className="border-t border-dashed border-gray-200 pt-1.5">
-                  <div className="bg-white/70 rounded-lg p-2.5 border border-orange-100 flex gap-2">
-                    <p className="text-[11px] text-gray-500 leading-relaxed flex-1">
-                      💡 首联时补问：「孩子在哪所幼儿园/小学呢？我看看离哪个校区最近」——补录后系统自动更新等级。
-                    </p>
-                    <div className="flex items-end shrink-0 gap-1.5 pb-0.5">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (navigator.clipboard) {
-                            navigator.clipboard.writeText("孩子在哪所幼儿园/小学呢？我看看离哪个校区最近");
-                          }
-                        }}
-                        className="px-3 py-1 bg-white border border-gray-200 rounded-md text-[11px] text-gray-600 font-medium hover:bg-gray-50 transition-colors shadow-sm"
-                      >
-                        复制
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowFeedbackModal(true);
-                        }}
-                        className="w-[26px] h-[26px] flex items-center justify-center rounded-full bg-violet-50 text-violet-500 border border-violet-100 hover:bg-violet-100 transition-colors"
-                      >
-                        <HelpCircle size={14} />
-                      </button>
-                    </div>
-                  </div>
                 </div>
               </div>
             )}
