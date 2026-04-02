@@ -99,7 +99,7 @@ export const MOCK_CUSTOMERS: Customer[] = [
   { 
     id: 'c10', name: '孙甜甜', phone: '188-5555-6666', customer_level: 'A', is_key_deal: false, 
     product_line: '瑞思英语', source_channel: '线上-抖音直播', intended_campus: '大悦城校区', 
-    customer_stage: '承诺上门', tab_category: '新分配客户', time_text: '首次：120后超时', 
+    customer_stage: '承诺上门', tab_category: '新分配客户', time_text: '首次：120:00后超时', 
     time_status: 'urgent', color: 'red', pipeline_stage: '邀约demo', 
     next_follow_up_at: null, demo_appointment_at: null, first_response_deadline_at: null,
     last_status_change_at: now.toISOString(), follow_up_period_days: null, min_follow_ups_required: null,
