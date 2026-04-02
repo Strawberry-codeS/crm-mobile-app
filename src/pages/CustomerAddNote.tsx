@@ -401,7 +401,10 @@ export default function CustomerAddNote() {
 }
 
 function NextFollowUpModal({ onClose }: { onClose: () => void }) {
+    const [showConflict, setShowConflict] = useState(false);
+
     return (
+        <>
         <div className="fixed inset-0 z-[70] flex flex-col justify-end items-center">
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onClick={onClose}></div>
             <div className="bg-white rounded-t-[1.25rem] w-full max-w-md h-[80vh] flex flex-col animate-in slide-in-from-bottom duration-300 relative z-10">
@@ -473,10 +476,35 @@ function NextFollowUpModal({ onClose }: { onClose: () => void }) {
                 {/* Footer */}
                 <div className="p-4 border-t border-gray-100 flex gap-3">
                     <button className="flex-1 py-3 rounded-full text-gray-500 font-bold border border-gray-200 bg-white" onClick={onClose}>取消</button>
-                    <button className="flex-1 py-3 rounded-full bg-violet-600 text-white font-bold shadow-lg shadow-violet-200" onClick={onClose}>确定</button>
+                    <button className="flex-1 py-3 rounded-full bg-violet-600 text-white font-bold shadow-lg shadow-violet-200" onClick={() => setShowConflict(true)}>确定</button>
                 </div>
             </div>
         </div>
+
+        {showConflict && (
+            <div className="fixed inset-0 z-[80] flex items-center justify-center px-6">
+                <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowConflict(false)} />
+                <div className="bg-white rounded-2xl w-full max-w-[300px] p-8 relative z-10 shadow-xl flex flex-col items-center animate-in zoom-in-95">
+                    <div className="w-12 h-12 bg-violet-600 rounded-full flex items-center justify-center mb-6">
+                        <span className="text-white font-serif text-[28px] italic -mt-1 font-medium">i</span>
+                    </div>
+                    <div className="text-violet-600 text-[15px] mb-8 w-full flex justify-center text-center">
+                        您此时间已有其他待跟进客户，<br/>是否选择该时间
+                    </div>
+                    <div className="flex gap-3 w-full">
+                        <button
+                            onClick={() => setShowConflict(false)}
+                            className="flex-1 py-3 text-gray-500 font-medium hover:bg-gray-50 rounded-full transition-colors text-sm"
+                        >否</button>
+                        <button
+                            onClick={onClose}
+                            className="flex-1 py-3 bg-violet-600 text-white font-medium rounded-full shadow-md shadow-violet-200 hover:bg-violet-700 transition-colors text-sm"
+                        >是</button>
+                    </div>
+                </div>
+            </div>
+        )}
+        </>
     );
 }
 

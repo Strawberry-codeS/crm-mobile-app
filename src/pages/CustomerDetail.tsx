@@ -119,7 +119,7 @@ export default function CustomerDetail() {
             </div>
             <div className="flex-[1.5] min-w-0">
               <div className="text-[10px] text-gray-400 mb-1 flex items-center">
-                渠道来源
+                第一来源
                 <SourceExpandBadge />
               </div>
               <div className="text-xs font-medium text-gray-800 truncate">线上营销-美团-抖音</div>
