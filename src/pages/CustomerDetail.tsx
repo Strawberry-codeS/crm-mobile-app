@@ -94,8 +94,8 @@ export default function CustomerDetail() {
                 </div>
                 <div className="flex gap-2 flex-wrap">
                   {profile.age && <span className="text-sm bg-blue-50 text-blue-600 px-3 py-1 rounded">{profile.age}</span>}
-                  <span className="text-sm bg-violet-50 text-violet-600 px-3 py-1 rounded">优惠价格</span>
-                  <span className="text-sm bg-violet-50 text-violet-600 px-3 py-1 rounded">服务策略</span>
+                  <span className="text-sm bg-gray-100 text-gray-600 px-3 py-1 rounded">优惠价格</span>
+                  <span className="text-sm bg-gray-100 text-gray-600 px-3 py-1 rounded">服务策略</span>
                 </div>
               </div>
             </div>
@@ -452,20 +452,7 @@ function TagsView({ tags }: { tags: any[] }) {
     { id: 9, tag_type: '行为标签', tag_value: '阅读大冒险活跃', is_active: false },
     { id: 10, tag_type: '行为标签', tag_value: '高频浏览自然拼读课包', is_active: false },
     { id: 11, tag_type: '客户阶段标签', tag_value: '已上门未缴费', is_active: true },
-    { id: 12, tag_type: '客户阶段标签', tag_value: '承诺上门', is_active: false },
-    { id: 13, tag_type: '客户阶段标签', tag_value: '承诺未上门', is_active: false },
-    { id: 14, tag_type: '客户阶段标签', tag_value: '未承诺', is_active: false },
-    { id: 15, tag_type: '客户阶段标签', tag_value: '已上门全款', is_active: false },
-    { id: 16, tag_type: '客户阶段标签', tag_value: '已上门订金', is_active: false },
-    { id: 17, tag_type: '客户阶段标签', tag_value: '无效', is_active: false },
-    { id: 18, tag_type: '客户阶段标签', tag_value: '退费', is_active: false },
-    { id: 19, tag_type: '客户阶段标签', tag_value: '禁拨', is_active: false },
     { id: 20, tag_type: '家长关注维度 (多选)', tag_value: '服务质量', is_active: true },
-    { id: 21, tag_type: '家长关注维度 (多选)', tag_value: '接送距离', is_active: false },
-    { id: 22, tag_type: '家长关注维度 (多选)', tag_value: '优惠力度', is_active: false },
-    { id: 23, tag_type: '家长关注维度 (多选)', tag_value: '竞品对比', is_active: false },
-    { id: 24, tag_type: '家长关注维度 (多选)', tag_value: '课程内容', is_active: false },
-    { id: 25, tag_type: '家长关注维度 (多选)', tag_value: '师资力量', is_active: false },
     { id: 26, tag_type: '自定义标签', tag_value: '对比友商中', is_active: true },
     { id: 27, tag_type: '自定义标签', tag_value: '注重师资', is_active: true },
   ];
@@ -834,7 +821,7 @@ function Tag({ children, active }: any) {
     <span className={cn(
       "px-4 py-2 rounded-lg text-xs font-medium transition-colors border",
       active
-        ? "bg-violet-50 text-violet-600 border-violet-100"
+        ? "bg-gray-200 text-gray-800 border-gray-300"
         : "bg-gray-50 text-gray-500 border-gray-100 hover:bg-gray-100"
     )}>
       {children}
