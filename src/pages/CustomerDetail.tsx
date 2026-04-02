@@ -545,7 +545,8 @@ function NotesView({ notes }: { notes: any[] }) {
           } else if (note.note_type === '小红书下单') {
             icon = <ShoppingBag size={16} />;
             color = "bg-red-100 text-red-600 border-red-100 border-opacity-50";
-            timeStr = '10-23 09:12';
+            title = '';
+            timeStr = '';
           } else if (note.note_type === '抖音商城下单') {
             icon = <ShoppingCart size={16} />;
             color = "bg-violet-100 text-violet-600 border-violet-100 border-opacity-50";
@@ -575,9 +576,17 @@ function NotesView({ notes }: { notes: any[] }) {
                 </div>
               )}
               {note.note_type === '小红书下单' && (
-                <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm font-bold flex justify-between items-center my-2">
-                  <span>{note.content}</span>
-                  <ChevronRight size={16} className="text-red-400" />
+                <div className="bg-red-50 text-red-600 p-4 rounded-2xl border border-red-100 flex flex-col my-2 cursor-pointer shadow-sm active:bg-red-100 transition-colors">
+                  <div className="flex justify-between items-center mb-1">
+                    <div className="flex items-center font-bold text-[15px]">
+                      <span className="text-red-500 mr-1.5 text-xs">●</span>
+                      小红书下单
+                    </div>
+                    <ChevronRight size={18} className="text-red-300" />
+                  </div>
+                  <div className="text-red-400 text-xs font-medium opacity-90">
+                    {'10-23 09:12'} · {note.content}
+                  </div>
                 </div>
               )}
               {note.note_type === '抖音商城下单' && (
