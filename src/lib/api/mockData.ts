@@ -106,26 +106,26 @@ export const MOCK_STUDENTS: Student[] = [
 
 export const MOCK_TAGS: CustomerTag[] = [
   // Tags for c4 (Chen Jason)
-  { id: 't1', customer_id: 'c4', tag_type: '基础标签', tag_value: '3岁', is_active: false, created_at: now.toISOString() },
-  { id: 't1-2', customer_id: 'c4', tag_type: '基础标签', tag_value: '北京', is_active: false, created_at: now.toISOString() },
-  { id: 't1-3', customer_id: 'c4', tag_type: '基础标签', tag_value: '女', is_active: false, created_at: now.toISOString() },
-  { id: 't1-4', customer_id: 'c4', tag_type: '基础标签', tag_value: '朝阳小学', is_active: false, created_at: now.toISOString() },
-  { id: 't1-5', customer_id: 'c4', tag_type: '基础标签', tag_value: '六年级', is_active: false, created_at: now.toISOString() },
-  { id: 't1-6', customer_id: 'c4', tag_type: '基础标签', tag_value: '探访', is_active: false, created_at: now.toISOString() },
-  { id: 't1-7', customer_id: 'c4', tag_type: '基础标签', tag_value: 'TMK下发', is_active: false, created_at: now.toISOString() },
+  { id: 't1', customer_id: 'c4', tag_type: '基础信息', tag_value: '3岁', is_active: false, created_at: now.toISOString() },
+  { id: 't1-2', customer_id: 'c4', tag_type: '基础信息', tag_value: '北京', is_active: false, created_at: now.toISOString() },
+  { id: 't1-3', customer_id: 'c4', tag_type: '基础信息', tag_value: '女', is_active: false, created_at: now.toISOString() },
+  { id: 't1-4', customer_id: 'c4', tag_type: '基础信息', tag_value: '朝阳小学', is_active: false, created_at: now.toISOString() },
+  { id: 't1-5', customer_id: 'c4', tag_type: '基础信息', tag_value: '六年级', is_active: false, created_at: now.toISOString() },
+  { id: 't1-6', customer_id: 'c4', tag_type: '基础信息', tag_value: '探访', is_active: false, created_at: now.toISOString() },
+  { id: 't1-7', customer_id: 'c4', tag_type: '基础信息', tag_value: 'TMK下发', is_active: false, created_at: now.toISOString() },
   
-  { id: 't2-1', customer_id: 'c4', tag_type: '行为标签', tag_value: '浏览启蒙', is_active: false, created_at: now.toISOString() },
-  { id: 't2-2', customer_id: 'c4', tag_type: '行为标签', tag_value: '阅读大冒险活跃', is_active: false, created_at: now.toISOString() },
-  { id: 't2-3', customer_id: 'c4', tag_type: '行为标签', tag_value: '高频浏览自然拼读课包', is_active: false, created_at: now.toISOString() },
+  { id: 't2-1', customer_id: 'c4', tag_type: '行为信息', tag_value: '浏览启蒙', is_active: false, created_at: now.toISOString() },
+  { id: 't2-2', customer_id: 'c4', tag_type: '行为信息', tag_value: '阅读大冒险活跃', is_active: false, created_at: now.toISOString() },
+  { id: 't2-3', customer_id: 'c4', tag_type: '行为信息', tag_value: '高频浏览自然拼读课包', is_active: false, created_at: now.toISOString() },
   
-  { id: 't3', customer_id: 'c4', tag_type: '客户阶段标签', tag_value: '已上门未缴费', is_active: true, created_at: now.toISOString() },
+  { id: 't3', customer_id: 'c4', tag_type: '客户阶段信息', tag_value: '已上门未缴费', is_active: true, created_at: now.toISOString() },
   { id: 't4', customer_id: 'c4', tag_type: '家长关注维度 (多选)', tag_value: '服务质量', is_active: true, created_at: now.toISOString() },
   
-  { id: 't5-1', customer_id: 'c4', tag_type: '自定义标签', tag_value: '对比友商中', is_active: true, created_at: now.toISOString() },
-  { id: 't5-2', customer_id: 'c4', tag_type: '自定义标签', tag_value: '注重师资', is_active: true, created_at: now.toISOString() },
+  { id: 't5-1', customer_id: 'c4', tag_type: '自定义信息', tag_value: '对比友商中', is_active: true, created_at: now.toISOString() },
+  { id: 't5-2', customer_id: 'c4', tag_type: '自定义信息', tag_value: '注重师资', is_active: true, created_at: now.toISOString() },
   
   // Tags for c7
-  { id: 't-c7', customer_id: 'c7', tag_type: '客户阶段标签', tag_value: '已正式报名', is_active: true, created_at: now.toISOString() }
+  { id: 't-c7', customer_id: 'c7', tag_type: '客户阶段信息', tag_value: '已正式报名', is_active: true, created_at: now.toISOString() }
 ];
 
 export const MOCK_NOTES: Note[] = [

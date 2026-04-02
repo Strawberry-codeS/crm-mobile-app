@@ -13,7 +13,6 @@ export default function CustomerAddNote() {
     const [activeProfile, setActiveProfile] = useState('jiesen');
     const [focusDimensions, setFocusDimensions] = useState<string[]>(['服务质量', '课程内容']);
     const [customerLevel, setCustomerLevel] = useState('A');
-    const [isKeyDeal, setIsKeyDeal] = useState('是');
     const [customerStage, setCustomerStage] = useState('已上门未缴费');
 
     const [consultationMethod, setConsultationMethod] = useState('电话咨询');
@@ -321,28 +320,6 @@ export default function CustomerAddNote() {
                     </div>
                 </div>
 
-                {/* Key Deal */}
-                <div className="bg-white rounded-2xl p-4 shadow-sm">
-                    <div className="flex items-center mb-3 border-l-4 border-violet-600 pl-2">
-                        <h3 className="font-bold text-gray-700">重点单</h3>
-                    </div>
-                    <div className="flex gap-4">
-                        {['是', '否'].map(opt => (
-                            <button
-                                key={opt}
-                                onClick={() => setIsKeyDeal(opt)}
-                                className={cn(
-                                    "flex-1 h-10 rounded-lg border flex items-center justify-center font-bold text-sm transition-colors",
-                                    isKeyDeal === opt
-                                        ? "border-violet-500 bg-violet-50 text-violet-600"
-                                        : "border-gray-200 text-gray-500"
-                                )}
-                            >
-                                {opt}
-                            </button>
-                        ))}
-                    </div>
-                </div>
 
                 {/* Focus Dimensions */}
                 <div className="bg-white rounded-2xl p-4 shadow-sm">
@@ -370,7 +347,7 @@ export default function CustomerAddNote() {
                 {/* Custom Tags */}
                 <div className="bg-white rounded-2xl p-4 shadow-sm">
                     <div className="flex items-center mb-3 border-l-4 border-violet-600 pl-2">
-                        <h3 className="font-bold text-gray-700">自定义标签</h3>
+                        <h3 className="font-bold text-gray-700">自定义信息</h3>
                     </div>
                     <div className="flex flex-wrap gap-3">
                         <button className="bg-violet-50 text-violet-600 px-4 py-2 rounded-full text-sm font-bold">对比友商中</button>

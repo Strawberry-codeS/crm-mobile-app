@@ -211,7 +211,7 @@ export default function CustomerDetail() {
               onClick={() => setActiveTab('tags')}
               className={cn("flex-1 py-4 text-sm font-bold text-center relative", activeTab === 'tags' ? "text-violet-600" : "text-gray-400")}
             >
-              标签
+              信息
               {activeTab === 'tags' && <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-violet-600 rounded-t-full"></div>}
             </button>
             <button
@@ -245,7 +245,7 @@ export default function CustomerDetail() {
         isOpen={activeStageModal === 'demo'}
         onClose={() => setActiveStageModal('none')}
         title={<span>是否将 <span className="font-bold">客户阶段</span> 调整为 <span className="font-bold">已邀约demo</span></span>}
-        subTitle="(同步将用户标签更新为承诺上门)"
+        subTitle="(同步将用户信息更新为承诺上门)"
         onConfirm={() => { }}
       />
 
@@ -253,7 +253,7 @@ export default function CustomerDetail() {
         isOpen={activeStageModal === 'visit'}
         onClose={() => setActiveStageModal('none')}
         title={<span>是否将 <span className="font-bold">客户阶段</span> 调整为 <span className="font-bold">已上门</span></span>}
-        subTitle="(同步将用户标签更新为已上门)"
+        subTitle="(同步将用户信息更新为已上门)"
         onConfirm={() => { }}
       />
 
@@ -441,20 +441,20 @@ function WeComFlowView({ wecomFlows }: { wecomFlows: any[] }) {
 
 function TagsView({ tags }: { tags: any[] }) {
   const displayTags = tags.length > 0 ? tags : [
-    { id: 1, tag_type: '基础标签', tag_value: '3岁', is_active: false },
-    { id: 2, tag_type: '基础标签', tag_value: '北京', is_active: false },
-    { id: 3, tag_type: '基础标签', tag_value: '女', is_active: false },
-    { id: 4, tag_type: '基础标签', tag_value: '朝阳小学', is_active: false },
-    { id: 5, tag_type: '基础标签', tag_value: '六年级', is_active: false },
-    { id: 6, tag_type: '基础标签', tag_value: '探访', is_active: false },
-    { id: 7, tag_type: '基础标签', tag_value: 'TMK下发', is_active: false },
-    { id: 8, tag_type: '行为标签', tag_value: '浏览启蒙', is_active: false },
-    { id: 9, tag_type: '行为标签', tag_value: '阅读大冒险活跃', is_active: false },
-    { id: 10, tag_type: '行为标签', tag_value: '高频浏览自然拼读课包', is_active: false },
-    { id: 11, tag_type: '客户阶段标签', tag_value: '已上门未缴费', is_active: true },
+    { id: 1, tag_type: '基础信息', tag_value: '3岁', is_active: false },
+    { id: 2, tag_type: '基础信息', tag_value: '北京', is_active: false },
+    { id: 3, tag_type: '基础信息', tag_value: '女', is_active: false },
+    { id: 4, tag_type: '基础信息', tag_value: '朝阳小学', is_active: false },
+    { id: 5, tag_type: '基础信息', tag_value: '六年级', is_active: false },
+    { id: 6, tag_type: '基础信息', tag_value: '探访', is_active: false },
+    { id: 7, tag_type: '基础信息', tag_value: 'TMK下发', is_active: false },
+    { id: 8, tag_type: '行为信息', tag_value: '浏览启蒙', is_active: false },
+    { id: 9, tag_type: '行为信息', tag_value: '阅读大冒险活跃', is_active: false },
+    { id: 10, tag_type: '行为信息', tag_value: '高频浏览自然拼读课包', is_active: false },
+    { id: 11, tag_type: '客户阶段信息', tag_value: '已上门未缴费', is_active: true },
     { id: 20, tag_type: '家长关注维度 (多选)', tag_value: '服务质量', is_active: true },
-    { id: 26, tag_type: '自定义标签', tag_value: '对比友商中', is_active: true },
-    { id: 27, tag_type: '自定义标签', tag_value: '注重师资', is_active: true },
+    { id: 26, tag_type: '自定义信息', tag_value: '对比友商中', is_active: true },
+    { id: 27, tag_type: '自定义信息', tag_value: '注重师资', is_active: true },
   ];
 
   const groupedTags = displayTags.reduce((acc, tag) => {
@@ -464,23 +464,23 @@ function TagsView({ tags }: { tags: any[] }) {
   }, {} as Record<string, any[]>);
 
   const getTagColor = (type: string) => {
-    if (type === '基础标签') return 'blue';
-    if (type === '行为标签') return 'pink';
-    if (type === '客户阶段标签') return 'orange';
+    if (type === '基础信息') return 'blue';
+    if (type === '行为信息') return 'pink';
+    if (type === '客户阶段信息') return 'orange';
     if (type === '家长关注维度 (多选)') return 'violet';
-    if (type === '自定义标签') return 'emerald';
+    if (type === '自定义信息') return 'emerald';
     return 'blue';
   };
 
   return (
     <div className="space-y-6">
-      <h3 className="font-bold text-lg mb-4">标签信息</h3>
+      <h3 className="font-bold text-lg mb-4 text-gray-900 border-l-4 border-violet-600 pl-3">信息详情</h3>
       {Object.entries(groupedTags).map(([type, groupTags]: [string, any[]]) => (
         <TagGroup key={type} title={type} color={getTagColor(type)}>
           {groupTags.map(t => (
             <Tag key={t.id} active={t.is_active}>{t.tag_value}</Tag>
           ))}
-          {type === '自定义标签' && (
+          {type === '自定义信息' && (
             <button className="border border-dashed border-gray-300 text-gray-400 px-4 py-2 rounded-lg text-xs font-medium flex items-center hover:bg-gray-50 transition-colors">
               <Plus size={14} className="mr-1" /> 添加
             </button>
@@ -490,7 +490,7 @@ function TagsView({ tags }: { tags: any[] }) {
 
       <div className="mb-6">
         <button className="border border-dashed border-gray-300 text-gray-400 px-4 py-2 rounded-lg text-xs font-medium flex items-center hover:bg-gray-50 transition-colors">
-          <Plus size={14} className="mr-1" /> 添加标签类别
+          <Plus size={14} className="mr-1" /> 添加信息类别
         </button>
       </div>
     </div>

@@ -1,4 +1,4 @@
-﻿import { Bell, Calendar as CalendarIcon, Phone, MessageSquare, Search, Filter, Menu, X, ChevronLeft, ChevronRight, ChevronDown, Info, Calendar, MapPin } from 'lucide-react';
+import { Bell, Calendar as CalendarIcon, Phone, MessageSquare, Search, Filter, Menu, X, ChevronLeft, ChevronRight, ChevronDown, Info, Calendar, MapPin } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -10,14 +10,13 @@ import { InlineCallPlayer, useInlineCallPlayer } from '@/components/InlineCallPl
 // ─── Supabase 数据映射辅助函数 ────────────────────────────────────────────────
 function buildTags(c: CustomerData): string[] {
   const tags: string[] = [];
-  if (c.source_channel) tags.push(c.source_channel);
   if (c.custom_tags && Array.isArray(c.custom_tags)) tags.push(...c.custom_tags);
   return tags.filter(Boolean);
 }
 
 function buildInfo(c: CustomerData): string {
   const parts: string[] = [];
-  if (c.product_line) parts.push(c.product_line);
+  if (c.source_channel) parts.push(c.source_channel);
   parts.push(c.is_key_deal ? '重点单' : '常规单');
   if (c.customer_level) parts.push(`${c.customer_level}类客户`);
   if (c.customer_stage) parts.push(c.customer_stage);
@@ -663,7 +662,6 @@ function FilterModal({ onClose }: { onClose: () => void }) {
   const [dealCount, setDealCount] = useState('0');
   const [customerStatus, setCustomerStatus] = useState('');
   const [customerLevel, setCustomerLevel] = useState('');
-  const [isKeyDeal, setIsKeyDeal] = useState('');
   const [dispatchMethod, setDispatchMethod] = useState('');
   const [focusDimensions, setFocusDimensions] = useState<string[]>([]);
   const [collectionTime, setCollectionTime] = useState('');
@@ -686,7 +684,6 @@ function FilterModal({ onClose }: { onClose: () => void }) {
     setDealCount('0');
     setCustomerStatus('');
     setCustomerLevel('');
-    setIsKeyDeal('');
     setDispatchMethod('');
     setFocusDimensions([]);
     setCollectionTime('');
@@ -696,7 +693,7 @@ function FilterModal({ onClose }: { onClose: () => void }) {
   const handleConfirm = () => {
     console.log('Filters applied:', {
       channel, age, childCount, grade, dealCount,
-      customerStatus, customerLevel, isKeyDeal,
+      customerStatus, customerLevel,
       dispatchMethod, focusDimensions, collectionTime, allocationTime
     });
     onClose();
@@ -830,19 +827,6 @@ function FilterModal({ onClose }: { onClose: () => void }) {
             </div>
           </FilterSection>
 
-          <FilterSection title="是否重点单">
-            <div className="flex gap-4">
-              {['是', '否'].map(opt => (
-                <FilterChip
-                  key={opt}
-                  active={isKeyDeal === opt}
-                  onClick={() => setIsKeyDeal(opt === isKeyDeal ? '' : opt)}
-                >
-                  {opt}
-                </FilterChip>
-              ))}
-            </div>
-          </FilterSection>
 
           <FilterSection title="下发方式">
             <div className="flex gap-3">

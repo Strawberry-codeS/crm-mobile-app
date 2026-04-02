@@ -75,7 +75,7 @@ export interface Student {
 export interface CustomerTag {
     id: string;
     customer_id: string;
-    tag_type: 'basic' | 'behavior' | 'stage' | 'focus' | 'custom';
+    tag_type: '基础信息' | '行为信息' | '客户阶段信息' | '家长关注维度 (多选)' | '自定义信息';
     tag_value: string;
     is_active: boolean;
     created_at: string;

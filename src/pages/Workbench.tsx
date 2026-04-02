@@ -1,4 +1,4 @@
-﻿import { Bell, Phone, MessageSquare, Search, Filter, Menu, X, MapPin, ChevronDown } from 'lucide-react';
+import { Bell, Phone, MessageSquare, Search, Filter, Menu, X, MapPin, ChevronDown } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import React from 'react';
@@ -319,7 +319,6 @@ export default function Workbench() {
                     {!customersLoading && customers.map((customer, index) => {
                         const { id, ...rest } = customer as any;
                         const cardTags = [];
-                        if (rest.source_channel) cardTags.push(rest.source_channel);
                         if (rest.custom_tags && Array.isArray(rest.custom_tags)) cardTags.push(...rest.custom_tags);
 
                         // Demo 文案映射：按客户姓名决定用户纪要内容
@@ -347,7 +346,7 @@ export default function Workbench() {
                                     timeStatus={rest.time_status || 'urgent'}
                                     task={cardTask}
                                     taskDetail={cardTaskDetail}
-                                    info={[rest.product_line, rest.is_key_deal ? '重点单' : '常规单', rest.customer_level ? `${rest.customer_level}类客户` : '', rest.customer_stage].filter(Boolean).join(' | ')}
+                                    info={[rest.source_channel, rest.is_key_deal ? '重点单' : '常规单', rest.customer_level ? `${rest.customer_level}类客户` : '', rest.customer_stage].filter(Boolean).join(' | ')}
                                     first_response_deadline_at={rest.first_response_deadline_at}
                                     follow_up_period_days={rest.follow_up_period_days}
                                     min_follow_ups_required={rest.min_follow_ups_required}
@@ -602,7 +601,6 @@ function FilterModal({ onClose }: { onClose: () => void }) {
     const [age, setAge] = useState('1');
     const [customerStatus, setCustomerStatus] = useState('');
     const [customerLevel, setCustomerLevel] = useState('');
-    const [isKeyDeal, setIsKeyDeal] = useState('');
     const [collectionTime, setCollectionTime] = useState('');
 
     const handleReset = () => {
@@ -610,7 +608,6 @@ function FilterModal({ onClose }: { onClose: () => void }) {
         setAge('1');
         setCustomerStatus('');
         setCustomerLevel('');
-        setIsKeyDeal('');
         setCollectionTime('');
     };
 
@@ -711,19 +708,6 @@ function FilterModal({ onClose }: { onClose: () => void }) {
                         </div>
                     </FilterSection>
 
-                    <FilterSection title="是否重点单">
-                        <div className="flex gap-4">
-                            {['是', '否'].map((opt) => (
-                                <FilterChip
-                                    key={opt}
-                                    active={isKeyDeal === opt}
-                                    onClick={() => setIsKeyDeal(opt === isKeyDeal ? '' : opt)}
-                                >
-                                    {opt}
-                                </FilterChip>
-                            ))}
-                        </div>
-                    </FilterSection>
 
                     <FilterSection title="采单时间">
                         <div className="flex gap-3">

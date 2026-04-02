@@ -1,4 +1,4 @@
-﻿import { Search, Filter, Phone, MessageSquare, ChevronDown, X, Calendar, MapPin } from 'lucide-react';
+import { Search, Filter, Phone, MessageSquare, ChevronDown, X, Calendar, MapPin } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
@@ -68,7 +68,7 @@ export default function CustomerList() {
 
   function buildInfo(c: CustomerData): string {
     const parts: string[] = [];
-    if (c.product_line) parts.push(c.product_line);
+    if (c.source_channel) parts.push(c.source_channel);
     parts.push(c.is_key_deal ? '重点单' : '常规单');
     if (c.customer_level) parts.push(`${c.customer_level}类客户`);
     if (c.customer_stage) parts.push(c.customer_stage);
@@ -177,17 +177,17 @@ export default function CustomerList() {
         {loading && <div className="text-center py-10 text-gray-400 text-sm animate-pulse">加载中...</div>}
         {!loading && customers.length === 0 && <div className="text-center py-10 text-gray-400 text-sm">暂无客户数据</div>}
         {!loading && customers.map((c) => {
-          let cardTags = [c.source_channel].filter(Boolean) as string[];
+          let cardTags: string[] = [];
           let cardTime = c.time_text ?? '';
           let cardTimeStatus = (c.time_status as string) ?? 'success';
 
           // Inject hardcoded overrides for specific demo users to match Workbench exactly
           if (c.name === '欧阳春晓') {
-            cardTags = ['2天待跟进1次', '线上-小表单'];
+            cardTags = ['2天待跟进1次'];
             cardTime = '已超时';
             cardTimeStatus = 'urgent';
           } else if (c.name === '欧阳小明') {
-            cardTags = ['2天待跟进1次', '线下-口碑'];
+            cardTags = ['2天待跟进1次'];
             cardTime = '已超时';
             cardTimeStatus = 'urgent';
           }
@@ -258,12 +258,6 @@ export default function CustomerList() {
                 </div>
               </FilterSection>
 
-              <FilterSection title="是否重点单">
-                <div className="flex gap-3">
-                  <FilterChip>是</FilterChip>
-                  <FilterChip active>否</FilterChip>
-                </div>
-              </FilterSection>
 
               <FilterSection title="采单时间">
                 <div className="flex gap-2 mb-3">
