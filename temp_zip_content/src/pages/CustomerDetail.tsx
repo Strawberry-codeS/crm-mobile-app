@@ -1,6 +1,6 @@
-import { ChevronLeft, Edit2, Copy, Plus, HelpCircle, Phone, MessageSquare, Users, CheckCircle, Clock, Calendar, ShoppingBag, ShoppingCart, ChevronDown, ChevronUp, FileText } from 'lucide-react';
+import { ChevronLeft, Edit2, Copy, Plus, HelpCircle, Phone, MessageSquare, Users, CheckCircle, Clock, Calendar, ShoppingBag, ShoppingCart } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useState, useRef, useEffect, type MouseEvent as RMouseEvent } from 'react';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useCustomer } from '@/hooks/useCustomer';
 
@@ -12,7 +12,6 @@ export default function CustomerDetail() {
 
   const [activeStudentIndex, setActiveStudentIndex] = useState(0);
   const [showAddPhoneModal, setShowAddPhoneModal] = useState(false);
-  const [activeStageModal, setActiveStageModal] = useState<'none' | 'demo' | 'visit' | 'enrollment'>('none');
   const activeStudent = students[activeStudentIndex];
 
   const profile = {
@@ -38,32 +37,40 @@ export default function CustomerDetail() {
       </div>
 
       <div className="p-4 space-y-4">
-        {/* Family Bar: show existing students and 新增学员 button */}
+        {/* Family Bar: dynamic based on students from Supabase */}
         <div className="flex space-x-3 overflow-x-auto no-scrollbar pb-2">
-          {students.map((student, index) => (
+          {students.map((student, idx) => (
             <button
               key={student.id}
-              onClick={() => setActiveStudentIndex(index)}
+              onClick={() => setActiveStudentIndex(idx)}
               className={cn(
-                "flex items-center justify-center rounded-full px-4 py-1 text-xs min-w-fit transition-all",
-                activeStudentIndex === index
-                  ? "bg-violet-600 text-white shadow-sm font-bold"
-                  : "bg-white border border-gray-200 text-gray-600"
+                "flex items-center rounded-full pl-1 pr-4 py-1 min-w-fit transition-all",
+                activeStudentIndex === idx
+                  ? "bg-white border border-violet-200 shadow-sm"
+                  : "bg-gray-100 border border-transparent opacity-60"
               )}
             >
-              {student.name}
+              <img
+                src={student.avatar_url ?? `https://picsum.photos/seed/${student.id}/40/40`}
+                className={cn("w-8 h-8 rounded-full mr-2 object-cover", activeStudentIndex !== idx && 'grayscale')}
+                alt="Avatar"
+              />
+              <span className={cn("text-sm font-bold text-gray-800", activeStudentIndex !== idx && 'font-medium text-gray-600')}>
+                {student.name}
+              </span>
+              {!student.is_primary && <span className="ml-2 text-[10px] bg-gray-200 px-1 rounded">小孩</span>}
             </button>
           ))}
           <button
             onClick={() => navigate('edit', { state: { newStudent: true } })}
             className="flex items-center justify-center border border-dashed border-gray-300 rounded-full px-3 py-1 text-xs text-gray-500 min-w-fit bg-white/50"
           >
-            + 新增学员
+            + 新增学员 (孩子)
           </button>
         </div>
 
         {/* Main Profile Card */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm relative">
+        <div className="bg-white rounded-2xl p-5 shadow-sm relative overflow-hidden">
           <div className="flex justify-between items-start">
             <div className="flex gap-4">
               <div className="relative">
@@ -92,10 +99,10 @@ export default function CustomerDetail() {
                     <Plus size={10} />
                   </button>
                 </div>
-                <div className="flex gap-2 flex-wrap">
-                  {profile.age && <span className="text-sm bg-blue-50 text-blue-600 px-3 py-1 rounded">{profile.age}</span>}
-                  <span className="text-sm bg-violet-50 text-violet-600 px-3 py-1 rounded">优惠价格</span>
-                  <span className="text-sm bg-violet-50 text-violet-600 px-3 py-1 rounded">服务策略</span>
+                <div className="flex gap-2">
+                  <span className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded">{profile.age}</span>
+                  <span className="text-xs bg-violet-50 text-violet-600 px-2 py-1 rounded">优惠价格</span>
+                  <span className="text-xs bg-violet-50 text-violet-600 px-2 py-1 rounded">服务策略</span>
                 </div>
               </div>
             </div>
@@ -107,30 +114,20 @@ export default function CustomerDetail() {
             </button>
           </div>
 
-          <div className="flex justify-between items-start mt-6 pt-4 border-t border-gray-50 gap-2 relative z-50">
-            <div className="flex-[1.2] min-w-0">
-              <div className="flex items-center text-[10px] text-gray-400 mb-1">
-                产品线 <HelpCircle size={10} className="ml-1 shrink-0" />
+          <div className="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-gray-50">
+            <div>
+              <div className="flex items-center text-xs text-gray-400 mb-1">
+                产品线 <HelpCircle size={10} className="ml-1" />
               </div>
-              <div className="text-xs font-medium text-gray-800 flex items-center">
-                <span className="truncate">瑞思英语</span>
-                <ChevronDownIcon className="ml-0.5 shrink-0" size={14} />
-              </div>
+              <div className="text-sm font-medium text-gray-800">瑞思英语 <ChevronDownIcon /></div>
             </div>
-            <div className="flex-[1.5] min-w-0">
-              <div className="text-[10px] text-gray-400 mb-1 flex items-center">
-                渠道来源
-                <SourceExpandBadge />
-              </div>
-              <div className="text-xs font-medium text-gray-800 truncate">线上营销-美团-抖音</div>
+            <div>
+              <div className="text-xs text-gray-400 mb-1">渠道来源</div>
+              <div className="text-sm font-medium text-gray-800">线上营销-美团-抖音</div>
             </div>
-            <div className="flex-1 min-w-0 text-center">
-              <div className="text-[10px] text-gray-400 mb-1">意向校区</div>
-              <div className="text-xs font-medium text-gray-800 truncate">大悦城校区</div>
-            </div>
-            <div className="flex-1 min-w-0 text-right">
-              <div className="text-[10px] text-gray-400 mb-1">推荐人</div>
-              <div className="text-xs font-medium text-gray-800 truncate">崔海燕</div>
+            <div className="text-right">
+              <div className="text-xs text-gray-400 mb-1">意向校区</div>
+              <div className="text-sm font-medium text-gray-800">大悦城校区</div>
             </div>
           </div>
         </div>
@@ -141,24 +138,15 @@ export default function CustomerDetail() {
             <CheckCircle size={16} className="mr-1" /> 接触阶段
           </div>
           <div className="h-px w-8 bg-violet-200"></div>
-          <div
-            className="flex items-center text-violet-600 font-bold cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={() => setActiveStageModal('demo')}
-          >
+          <div className="flex items-center text-violet-600 font-bold">
             <div className="w-4 h-4 rounded-full bg-violet-600 mr-1"></div> 邀约demo
           </div>
           <div className="h-px w-8 bg-gray-200"></div>
-          <div
-            className="flex items-center text-gray-400 cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={() => setActiveStageModal('visit')}
-          >
-            <div className="w-2 h-2 rounded-full bg-gray-300 mr-2"></div> 已上门
+          <div className="flex items-center text-gray-400">
+            <div className="w-2 h-2 rounded-full bg-gray-300 mr-2"></div> 已到访
           </div>
           <div className="h-px w-8 bg-gray-200"></div>
-          <div
-            className="flex items-center text-gray-400 cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={() => setActiveStageModal('enrollment')}
-          >
+          <div className="flex items-center text-gray-400">
             <div className="w-2 h-2 rounded-full bg-gray-300 mr-2"></div> 正式报名
           </div>
         </div>
@@ -182,25 +170,25 @@ export default function CustomerDetail() {
             <span className="text-sm text-gray-600">已邀约<span className="text-violet-600 font-bold">2月6日下午4点</span>的瑞思demo-p</span>
           </div>
 
-          <PriorityCard />
+          <div className="bg-orange-50 border border-orange-100 rounded-lg p-3 flex items-start gap-2">
+            <HelpCircle className="text-orange-500 mt-0.5" size={16} />
+            <span className="text-xs text-gray-600">最近用户 <span className="text-orange-500 font-bold">5天</span> 未有状态变更， 建议早日跟进</span>
+          </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <button
             onClick={() => navigate('add-note', { state: { isCall: true } })}
-            className="flex items-center justify-center gap-1.5 bg-violet-100 text-violet-700 py-3 rounded-xl font-bold hover:bg-violet-200 transition text-sm"
+            className="flex items-center justify-center gap-2 bg-violet-100 text-violet-700 py-3 rounded-xl font-bold hover:bg-violet-200 transition"
           >
-            <Phone size={16} /> 电话
+            <Phone size={18} /> 电话
           </button>
-          <button className="flex items-center justify-center gap-1.5 bg-violet-100 text-violet-700 py-3 rounded-xl font-bold hover:bg-violet-200 transition text-sm">
-            <MessageSquare size={16} /> 单聊
+          <button className="flex items-center justify-center gap-2 bg-violet-100 text-violet-700 py-3 rounded-xl font-bold hover:bg-violet-200 transition">
+            <MessageSquare size={18} /> 单聊
           </button>
-          <button className="flex items-center justify-center gap-1.5 bg-violet-100 text-violet-700 py-3 rounded-xl font-bold hover:bg-violet-200 transition text-sm">
-            <Users size={16} /> 群聊
-          </button>
-          <button className="flex items-center justify-center gap-1.5 bg-violet-100 text-violet-700 py-3 rounded-xl font-bold hover:bg-violet-200 transition text-sm">
-            <FileText size={16} /> 建合同
+          <button className="flex items-center justify-center gap-2 bg-violet-100 text-violet-700 py-3 rounded-xl font-bold hover:bg-violet-200 transition">
+            <Users size={18} /> 群聊
           </button>
         </div>
 
@@ -239,46 +227,6 @@ export default function CustomerDetail() {
       </div>
 
       {showAddPhoneModal && <AddPhoneModal onClose={() => setShowAddPhoneModal(false)} />}
-
-      {/* Stage Modals */}
-      <StageConfirmModal
-        isOpen={activeStageModal === 'demo'}
-        onClose={() => setActiveStageModal('none')}
-        title={<span>是否将 <span className="font-bold">客户阶段</span> 调整为 <span className="font-bold">已邀约demo</span></span>}
-        subTitle="(同步将用户标签更新为承诺上门)"
-        onConfirm={() => { }}
-      />
-
-      <StageConfirmModal
-        isOpen={activeStageModal === 'visit'}
-        onClose={() => setActiveStageModal('none')}
-        title={<span>是否将 <span className="font-bold">客户阶段</span> 调整为 <span className="font-bold">已上门</span></span>}
-        subTitle="(同步将用户标签更新为已上门)"
-        onConfirm={() => { }}
-      />
-
-      <StageConfirmModal
-        isOpen={activeStageModal === 'enrollment'}
-        onClose={() => setActiveStageModal('none')}
-        title="正式报名状态会在客户签署合同后自动同步"
-        onConfirm={() => { }}
-        customButtons={
-          <>
-            <button
-              onClick={() => setActiveStageModal('none')}
-              className="flex-1 py-3 bg-violet-600 text-white font-medium rounded-full shadow-md shadow-violet-200 hover:bg-violet-700 transition-colors text-sm"
-            >
-              确认
-            </button>
-            <button
-              onClick={() => setActiveStageModal('none')}
-              className="flex-1 py-3 bg-[#c4a5ff] text-white font-medium rounded-full hover:bg-violet-400 transition-colors text-sm"
-            >
-              建合同
-            </button>
-          </>
-        }
-      />
     </div>
   );
 }
@@ -327,73 +275,6 @@ function AddPhoneModal({ onClose }: { onClose: () => void }) {
           >
             确认添加
           </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function StageConfirmModal({
-  isOpen,
-  onClose,
-  title,
-  subTitle,
-  onConfirm,
-  confirmText = "确认",
-  cancelText = "取消",
-  customButtons,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  title: React.ReactNode;
-  subTitle?: string;
-  onConfirm: () => void;
-  confirmText?: string;
-  cancelText?: string;
-  customButtons?: React.ReactNode;
-}) {
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onClick={onClose}></div>
-      <div className="bg-white rounded-[2rem] w-full max-w-[320px] p-8 animate-in zoom-in-95 duration-200 relative z-10 shadow-xl flex flex-col items-center">
-        {/* Info Icon */}
-        <div className="w-12 h-12 bg-violet-600 rounded-full flex items-center justify-center mb-6">
-          <span className="text-white font-serif text-[28px] italic -mt-1 font-medium">i</span>
-        </div>
-
-        {/* Title */}
-        <div className="text-violet-600 text-[15px] mb-2 w-full flex justify-center whitespace-nowrap">
-          {title}
-        </div>
-
-        {/* Subtitle */}
-        {subTitle && (
-          <div className="text-[#a1a1aa] text-xs mb-8 w-full flex justify-center">
-            {subTitle}
-          </div>
-        )}
-
-        {/* Buttons */}
-        <div className="flex gap-3 w-full mt-2">
-          {customButtons ? (
-            customButtons
-          ) : (
-            <>
-              <button
-                onClick={onClose}
-                className="flex-1 py-3 text-gray-500 font-medium hover:bg-gray-50 rounded-full transition-colors text-sm"
-              >
-                {cancelText}
-              </button>
-              <button
-                onClick={() => { onConfirm(); onClose(); }}
-                className="flex-1 py-3 bg-violet-600 text-white font-medium rounded-full shadow-md shadow-violet-200 hover:bg-violet-700 transition-colors text-sm"
-              >
-                {confirmText}
-              </button>
-            </>
-          )}
         </div>
       </div>
     </div>
@@ -600,7 +481,10 @@ function NotesView({ notes }: { notes: any[] }) {
                 </div>
               )}
               {note.call_status && (
-                <CallPlayer duration={note.duration_seconds} status={note.call_status} />
+                <div className="flex gap-2">
+                  {note.duration_seconds && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">通话 {note.duration_seconds}</span>}
+                  {note.call_status && <span className="text-xs bg-emerald-100 text-emerald-600 px-2 py-1 rounded">{note.call_status}</span>}
+                </div>
               )}
             </TimelineItem>
           )
@@ -608,189 +492,6 @@ function NotesView({ notes }: { notes: any[] }) {
       </div>
     </div>
   )
-}
-
-// ─── 通话播放器组件 ────────────────────────────────────────────────────────────
-function CallPlayer({ duration, status }: { duration: string; status: string }) {
-  // Convert "MM:SS" to total seconds
-  const [mm, ss] = duration.split(':').map(Number);
-  const totalSecs = mm * 60 + ss;
-
-  const [expanded, setExpanded] = useState(false);
-  const [playing, setPlaying] = useState(false);
-  const [elapsed, setElapsed] = useState(0);
-  const [speed, setSpeed] = useState(1.0);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // ─ progress tick ─
-  useEffect(() => {
-    if (playing) {
-      intervalRef.current = setInterval(() => {
-        setElapsed(e => {
-          if (e + 1 >= totalSecs) {
-            setPlaying(false);
-            return totalSecs;
-          }
-          return e + 1;
-        });
-      }, 1000 / speed);
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    }
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [playing, speed, totalSecs]);
-
-  // ─ click outside to collapse ─
-  useEffect(() => {
-    if (!expanded) return;
-    const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setExpanded(false);
-        setPlaying(false);
-        setElapsed(0);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [expanded]);
-
-  const handlePlay = (e: RMouseEvent) => {
-    e.stopPropagation();
-    if (!expanded) {
-      setExpanded(true);
-      setPlaying(true);
-      setElapsed(0);
-    } else {
-      setPlaying(v => !v);
-    }
-  };
-
-  // Format elapsed seconds for display
-  const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
-  const pct = totalSecs > 0 ? (elapsed / totalSecs) * 100 : 0;
-
-  const speeds = [1.0, 1.5, 2.0];
-  const cycleSpeed = (e: RMouseEvent) => {
-    e.stopPropagation();
-    setSpeed(s => speeds[(speeds.indexOf(s) + 1) % speeds.length]);
-  };
-
-  return (
-    <div ref={containerRef} className="mt-1">
-      {!expanded ? (
-        /* ── 收起态: 播放按钮 pill ── */
-        <button
-          onClick={handlePlay}
-          className="flex items-center gap-2 bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full text-sm text-gray-700 font-medium hover:bg-gray-100 transition-colors"
-        >
-          {/* Play triangle */}
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="#6D28D9">
-            <polygon points="2,1 11,6 2,11" />
-          </svg>
-          <span>通话 {duration}</span>
-        </button>
-      ) : (
-        /* ── 展开态: 播放器行 ── */
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full">
-            {/* Pause / Play toggle */}
-            <button onClick={handlePlay} className="flex-shrink-0 text-violet-600">
-              {playing ? (
-                /* Pause icon */
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="#6D28D9">
-                  <rect x="2" y="2" width="3.5" height="10" rx="1" />
-                  <rect x="8.5" y="2" width="3.5" height="10" rx="1" />
-                </svg>
-              ) : (
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="#6D28D9">
-                  <polygon points="2,1 13,7 2,13" />
-                </svg>
-              )}
-            </button>
-
-            <span className="text-xs font-medium text-gray-700 flex-shrink-0">通话</span>
-
-            {/* Progress track */}
-            <div className="relative flex-1 h-1.5 bg-gray-200 rounded-full mx-1">
-              <div
-                className="absolute left-0 top-0 h-1.5 bg-violet-500 rounded-full transition-all"
-                style={{ width: `${pct}%` }}
-              />
-              {/* Thumb */}
-              <div
-                className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-white border-2 border-violet-500 rounded-full shadow-sm"
-                style={{ left: `calc(${pct}% - 7px)` }}
-              />
-              {/* Invisible range input for seeking */}
-              <input
-                type="range"
-                min={0}
-                max={totalSecs}
-                value={elapsed}
-                onChange={e => { setElapsed(Number(e.target.value)); }}
-                onClick={e => e.stopPropagation()}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
-            </div>
-
-            {/* Time */}
-            <span className="text-xs text-gray-500 flex-shrink-0 w-9 text-right">{fmt(elapsed)}</span>
-
-            {/* Speed */}
-            <button
-              onClick={cycleSpeed}
-              className="text-xs font-bold text-violet-600 flex-shrink-0 w-8 text-right"
-            >
-              {speed.toFixed(1)}x
-            </button>
-          </div>
-
-          {/* 已接通 badge on its own row */}
-          <div>
-            <span className="text-xs bg-emerald-100 text-emerald-600 px-2 py-1 rounded-full font-medium">
-              {status}
-            </span>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function SourceExpandBadge() {
-  const [expanded, setExpanded] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!expanded) return;
-    const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setExpanded(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [expanded]);
-
-  return (
-    <div className="relative inline-flex items-center ml-2" ref={containerRef}>
-      <span
-        onClick={() => setExpanded(v => !v)}
-        className="inline-flex items-center gap-0.5 bg-orange-50 text-orange-500 px-1.5 py-0.5 rounded-full cursor-pointer hover:bg-orange-100 transition-colors"
-      >
-        <HelpCircle size={10} />
-        <span>拓展</span>
-      </span>
-      {expanded && (
-        <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-gray-100 p-1.5 z-20 w-28">
-          <div className="text-xs text-gray-700 py-2.5 px-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">美团-团购</div>
-          <div className="text-xs text-gray-700 py-2.5 px-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">抖音-直播</div>
-          <div className="text-xs text-gray-700 py-2.5 px-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">大众点评</div>
-        </div>
-      )}
-    </div>
-  );
 }
 
 function TimelineItem({ icon, color, title, time, children }: any) {
@@ -842,150 +543,9 @@ function Tag({ children, active }: any) {
   );
 }
 
-function PriorityCard() {
-  const [expanded, setExpanded] = useState(false);
-  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-
+function ChevronDownIcon() {
   return (
-    <>
-      <div className="rounded-xl border border-orange-100 bg-orange-50 overflow-hidden select-none">
-        {/* Content area with left icon */}
-        <div className="flex gap-2.5 px-3 pt-3">
-          {/* Left orange question mark icon */}
-          <div className="flex-shrink-0 mt-0.5">
-            <HelpCircle className="text-orange-400" size={20} />
-          </div>
-
-          {/* Text rows */}
-          <div className="flex-1 min-w-0">
-            <p className={`text-xs leading-5 ${expanded ? 'text-gray-600' : 'truncate text-gray-600'}`}>
-              <span className="font-bold">【重点理由】</span>刚才在直播间购买了体验课，之前还看了两条课程视频，停在价格页超过3分钟。25分钟前刚发生。
-            </p>
-            <p className={`text-xs leading-5 mt-0.5 ${expanded ? 'text-gray-600' : 'truncate text-gray-600'}`}>
-              <span className="font-bold">【客户关注】</span>体验课怎么上 · 价格是否划算 · 上课地点方不方便
-            </p>
-
-            {/* 3rd row with bottom-up gradient fade when collapsed */}
-            <div className="relative mt-1.5">
-              <div className="bg-white/70 rounded-lg p-2.5 border border-orange-100 flex gap-2">
-                <p className={`text-xs leading-5 text-gray-600 flex-1 ${!expanded ? 'truncate' : ''}`}>
-                  <span className="font-bold">【建议开场】</span>「您好，我是瑞思的老师，看到您刚预约了体验课，想帮您确认一下上课时间——您方便说一下孩子几岁，这边给您安排最合适的班级。」
-                </p>
-                {expanded && (
-                  <div className="flex items-end shrink-0 gap-1.5 pb-0.5">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (navigator.clipboard) {
-                          navigator.clipboard.writeText("您好，我是瑞思的老师，看到您刚预约了体验课，想帮您确认一下上课时间——您方便说一下孩子几岁，这边给您安排最合适的班级。");
-                        }
-                      }}
-                      className="px-3 py-1 bg-white border border-gray-200 rounded-md text-[11px] text-gray-600 font-medium hover:bg-gray-50 transition-colors shadow-sm"
-                    >
-                      复制
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowFeedbackModal(true);
-                      }}
-                      className="w-[26px] h-[26px] flex items-center justify-center rounded-full bg-violet-50 text-violet-500 border border-violet-100 hover:bg-violet-100 transition-colors"
-                    >
-                      <HelpCircle size={14} />
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Extra content shown only when expanded */}
-            {expanded && (
-              <div className="mt-2 space-y-2">
-                <div className="border-t border-orange-100 pt-1.5">
-                  <p className="text-xs text-gray-600 leading-5">
-                    <span className="font-bold text-orange-600">【注意】</span>她在意性价比，先别推年课，让她把体验课上了再说。
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Bottom center chevron toggle button */}
-        <div className="flex justify-center pb-2 pt-1.5">
-          <button
-            onClick={() => setExpanded(v => !v)}
-            className="flex items-center justify-center w-6 h-6 rounded-full bg-white/80 border border-orange-100 text-gray-400 hover:bg-white transition-colors"
-          >
-            {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-          </button>
-        </div>
-      </div>
-      
-      <FeedbackModal isOpen={showFeedbackModal} onClose={() => setShowFeedbackModal(false)} />
-    </>
-  );
-}
-
-function FeedbackModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const [text, setText] = useState("");
-  
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onClick={onClose}></div>
-      <div className="bg-white rounded-[1.5rem] w-full max-w-[320px] pt-8 animate-in zoom-in-95 duration-200 relative z-10 shadow-xl flex flex-col items-center overflow-hidden">
-        
-        {/* Title */}
-        <div className="text-gray-900 text-[17px] font-bold mb-2 w-full flex justify-center whitespace-nowrap">
-          反馈话术不好用
-        </div>
-
-        {/* Subtitle */}
-        <div className="text-gray-500 text-xs mb-6 w-full flex justify-center">
-          告诉我们哪里不好，我们会努力改进
-        </div>
-
-        {/* Textarea */}
-        <div className="w-full px-5 mb-6">
-          <div className="bg-gray-50 rounded-xl p-3 relative h-28">
-            <textarea 
-              className="w-full h-full bg-transparent border-none text-sm placeholder:text-gray-400 focus:outline-none resize-none"
-              placeholder="请输入您觉得不好用的话术问题~"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              maxLength={300}
-            />
-            <div className="absolute bottom-2 right-3 text-[10px] text-gray-400">
-              {text.length}/300
-            </div>
-          </div>
-        </div>
-
-        {/* Dividers & Buttons */}
-        <div className="w-full border-t border-gray-100 flex">
-          <button
-            onClick={onClose}
-            className="flex-1 py-3.5 text-gray-500 font-medium text-[15px] border-r border-gray-100 hover:bg-gray-50 transition-colors"
-          >
-            取消
-          </button>
-          <button
-            onClick={onClose}
-            className="flex-1 py-3.5 text-violet-600 font-bold text-[15px] hover:bg-gray-50 transition-colors"
-          >
-            提交
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ChevronDownIcon({ className, size = 14 }: { className?: string; size?: number }) {
-  return (
-    <svg width={size} height={size * 0.6} viewBox="0 0 10 6" fill="none" className={cn("inline-block ml-1", className)}>
+    <svg width="10" height="6" viewBox="0 0 10 6" fill="none" className="inline-block ml-1">
       <path d="M1 1L5 5L9 1" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
