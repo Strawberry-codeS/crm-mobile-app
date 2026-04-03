@@ -402,8 +402,8 @@ function StageConfirmModal({
 
 function WeComFlowView({ wecomFlows }: { wecomFlows: any[] }) {
   const displayFlows = wecomFlows.length > 0 ? wecomFlows : [
-    { id: 1, created_at: '2023-12-28T14:20:00', flow_type: '流转至', to_staff_id: '顾老师', note: '在职继承', stage_at_time: '用户 已全款' },
-    { id: 2, created_at: '2023-11-15T09:45:00', flow_type: '流转至', to_staff_id: '李顾问', note: '离职继承', stage_at_time: '用户 承诺上门, 商机分配' },
+    { id: 1, created_at: '2023-12-28T14:20:00', flow_type: '流转至', to_staff_id: '顾老师', note: '在职继承', stage_at_time: '已全款' },
+    { id: 2, created_at: '2023-11-15T09:45:00', flow_type: '流转至', to_staff_id: '李顾问', note: '离职继承', stage_at_time: '承诺上门' },
     { id: 3, created_at: '2023-10-01T10:00:00', flow_type: '初始分配', to_staff_id: '果媛', note: '用户主动扫码添加', stage_at_time: '未承诺' }
   ];
 
