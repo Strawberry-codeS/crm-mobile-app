@@ -67,9 +67,9 @@ export const MOCK_CUSTOMERS: Customer[] = [
     phones: [{ number: '139-0000-0002', type: 'primary' }], avatar_url: null, assigned_to: null, focus_dimensions: null, custom_tags: null
   },
   { 
-    id: 'c7', name: '张小帅', phone: '135-1234-5678', customer_level: 'A', is_key_deal: true, 
+    id: 'c7', name: '张小帅', phone: '135-1234-5678', customer_level: 'A', is_key_deal: false, 
     product_line: '瑞思英语', source_channel: '线上-搜索', intended_campus: '三里屯校区', 
-    customer_stage: '已成交', tab_category: '重点客户', time_text: '回访计划中', 
+    customer_stage: '已成交', tab_category: '已成交客户', time_text: '回访计划中', 
     time_status: 'success', color: 'purple', pipeline_stage: '正式学员', 
     next_follow_up_at: null, demo_appointment_at: null, first_response_deadline_at: null,
     last_status_change_at: now.toISOString(), follow_up_period_days: null, min_follow_ups_required: null,
