@@ -340,9 +340,6 @@ function CustomerItem({ id, name, task, sourceChannel, isKeyDeal, age, stage, ti
         <div className="flex items-center flex-wrap gap-2 min-w-0 pr-2">
           <h3 className="font-bold text-lg text-gray-900 whitespace-nowrap shrink-0">{name}</h3>
           
-          <span className="text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 bg-red-500 text-white">
-            3天待跟进2次
-          </span>
           <div className="relative inline-block">
             <button 
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowRecoverPopup(!showRecoverPopup); }}
@@ -362,11 +359,16 @@ function CustomerItem({ id, name, task, sourceChannel, isKeyDeal, age, stage, ti
             )}
           </div>
         </div>
-        <div className={`flex items-center text-xs font-medium shrink-0 ml-1 ${timeColorClass}`}>
-          {timeStatus === 'urgent' && <ClockIcon className="mr-1" />}
-          {timeStatus === 'warning' && <ClockIcon className="mr-1 text-orange-500" fill="#FDBA74" />}
-          {timeStatus === 'success' && <ClockIcon className="mr-1 text-emerald-500" fill="#6EE7B7" />}
-          {time}
+        <div className="flex flex-col items-end shrink-0 ml-1 relative">
+          <div className={`flex items-center text-xs font-medium ${timeColorClass}`}>
+            {timeStatus === 'urgent' && <ClockIcon className="mr-1" />}
+            {timeStatus === 'warning' && <ClockIcon className="mr-1 text-orange-500" fill="#FDBA74" />}
+            {timeStatus === 'success' && <ClockIcon className="mr-1 text-emerald-500" fill="#6EE7B7" />}
+            {time}
+          </div>
+          <div className="absolute top-[16px] right-0 text-[10px] font-normal text-gray-400 whitespace-nowrap scale-90 origin-right">
+            3天内跟进2次
+          </div>
         </div>
       </div>
 
