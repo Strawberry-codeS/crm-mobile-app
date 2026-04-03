@@ -66,15 +66,6 @@ export default function CustomerList() {
     setActiveTab(tab);
   };
 
-  function buildInfo(c: CustomerData): string {
-    const parts: string[] = [];
-    if (c.source_channel) parts.push(c.source_channel);
-    parts.push(c.is_key_deal ? '重点单' : '常规单');
-    if (c.customer_level) parts.push(`${c.customer_level}类客户`);
-    if (c.customer_stage) parts.push(c.customer_stage);
-    return parts.join(' | ');
-  }
-
   return (
     <div className="p-4 h-full flex flex-col relative">
       {/* Header */}
@@ -177,29 +168,39 @@ export default function CustomerList() {
         {loading && <div className="text-center py-10 text-gray-400 text-sm animate-pulse">加载中...</div>}
         {!loading && customers.length === 0 && <div className="text-center py-10 text-gray-400 text-sm">暂无客户数据</div>}
         {!loading && customers.map((c) => {
-          let cardTags: string[] = [];
           let cardTime = c.time_text ?? '';
           let cardTimeStatus = (c.time_status as string) ?? 'success';
 
           // Inject hardcoded overrides for specific demo users to match Workbench exactly
           if (c.name === '欧阳春晓') {
-            cardTags = ['2天待跟进1次'];
             cardTime = '已超时';
             cardTimeStatus = 'urgent';
           } else if (c.name === '欧阳小明') {
-            cardTags = ['2天待跟进1次'];
             cardTime = '已超时';
             cardTimeStatus = 'urgent';
           }
+
+          let isKeyDeal = c.is_key_deal;
+          if (c.name === '欧阳春晓' || c.name === '王梓轩') {
+            isKeyDeal = true;
+          }
+
+          let age = '';
+          if (c.customer_level === 'A') age = '3岁';
+          else if (c.customer_level === 'B') age = '4岁';
+          else if (c.customer_level === 'C') age = '5岁';
+          else if (c.customer_level) age = `${c.customer_level}岁`;
 
           return (
             <CustomerItem
               key={c.id}
               id={c.id}
               name={c.name}
-              tags={cardTags}
               task={c.customer_stage ? `用户纪要：${c.customer_stage}` : '用户纪要：跟进'}
-              info={buildInfo(c)}
+              sourceChannel={c.source_channel}
+              isKeyDeal={isKeyDeal}
+              age={age}
+              stage={c.customer_stage}
               time={cardTime}
               color={(c.color as string) ?? 'gray'}
               timeStatus={cardTimeStatus}
@@ -316,11 +317,13 @@ function FilterChip({ children, active }: any) {
   );
 }
 
-function CustomerItem({ id, name, tags, task, info, time, urgent, status, color = "red", timeStatus = "urgent" }: any) {
+function CustomerItem({ id, name, task, sourceChannel, isKeyDeal, age, stage, time, urgent, status, color = "red", timeStatus = "urgent" }: any) {
   const navigate = useNavigate();
   const isDone = status === 'done';
   const [taskExpanded, setTaskExpanded] = useState(false);
   const callPlayer = useInlineCallPlayer("03:15");
+  const [showRecoverPopup, setShowRecoverPopup] = useState(false);
+  const [showAIPopup, setShowAIPopup] = useState(false);
 
   let borderClass = "border-l-[6px] border-red-400";
   if (color === 'orange') borderClass = "border-l-[6px] border-orange-400";
@@ -332,34 +335,34 @@ function CustomerItem({ id, name, tags, task, info, time, urgent, status, color 
   if (timeStatus === 'success') timeColorClass = "text-emerald-500";
 
   return (
-    <Link to={`/customers/${id}`} className={`block bg-white rounded-3xl p-5 shadow-sm relative overflow-hidden ${borderClass}`}>
+    <Link to={`/customers/${id}`} className={`block bg-white rounded-3xl p-5 shadow-sm relative ${borderClass}`}>
       <div className="flex justify-between items-start mb-4">
-        <div className="flex items-center flex-nowrap gap-2 min-w-0 overflow-hidden">
+        <div className="flex items-center flex-wrap gap-2 min-w-0 pr-2">
           <h3 className="font-bold text-lg text-gray-900 whitespace-nowrap shrink-0">{name}</h3>
-          {tags.map((tag: string, i: number) => {
-            let bgColor = 'bg-gray-100';
-            let textColor = 'text-gray-600';
-
-            if (i === 0 && tag.includes('天待跟进')) {
-              bgColor = 'bg-red-500'; textColor = 'text-white';
-            } else if (tag.includes('小红书') || tag.includes('小表单')) {
-              bgColor = 'bg-red-100'; textColor = 'text-red-600';
-            } else if (tag.includes('抖音') || tag.includes('线上')) {
-              bgColor = 'bg-violet-100'; textColor = 'text-violet-600';
-            } else if (tag.includes('试听')) {
-              bgColor = 'bg-purple-100'; textColor = 'text-purple-600';
-            } else if (tag.includes('线下') || tag.includes('地推') || tag.includes('口碑')) {
-              bgColor = 'bg-blue-100'; textColor = 'text-blue-600';
-            }
-
-            return (
-              <span key={i} className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${bgColor} ${textColor}`}>
-                {tag}
-              </span>
-            );
-          })}
+          
+          <span className="text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 bg-red-500 text-white">
+            3天待跟进2次
+          </span>
+          <div className="relative inline-block">
+            <button 
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowRecoverPopup(!showRecoverPopup); }}
+              className="text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 bg-red-50 text-red-500 border border-red-300 flex items-center gap-1"
+            >
+              30天内回收
+              <span className="w-3 h-3 rounded-full bg-red-200 flex items-center justify-center font-bold text-[8px] leading-none">?</span>
+            </button>
+            {showRecoverPopup && (
+              <div 
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-20 w-52 bg-gray-800 text-white text-[10px] p-2.5 rounded-lg shadow-xl text-center whitespace-normal"
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+              >
+                回收条件：30天内未成单，未完成跟进条件
+                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
+              </div>
+            )}
+          </div>
         </div>
-        <div className={`flex items-center text-xs font-medium shrink-0 ml-2 ${timeColorClass}`}>
+        <div className={`flex items-center text-xs font-medium shrink-0 ml-1 ${timeColorClass}`}>
           {timeStatus === 'urgent' && <ClockIcon className="mr-1" />}
           {timeStatus === 'warning' && <ClockIcon className="mr-1 text-orange-500" fill="#FDBA74" />}
           {timeStatus === 'success' && <ClockIcon className="mr-1 text-emerald-500" fill="#6EE7B7" />}
@@ -416,16 +419,56 @@ function CustomerItem({ id, name, tags, task, info, time, urgent, status, color 
 
       <div className="flex justify-between items-end">
         <div className="flex flex-wrap gap-2">
-          {info.split('|').map((item: string, i: number) => (
-            <span key={i} className={cn(
-              "text-xs px-2 py-1 rounded-md font-medium",
-              item.trim() === '重点单' ? "bg-red-50 text-red-500" : "bg-gray-100 text-gray-500"
-            )}>
-              {item.trim()}
+          {sourceChannel && (
+            <span className="text-xs px-2 py-1 rounded-md font-medium bg-gray-100 text-gray-500">
+              {sourceChannel}
             </span>
-          ))}
+          )}
+
+          {isKeyDeal ? (
+            <div className="relative inline-block">
+              <button 
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowAIPopup(!showAIPopup); }}
+                className={cn(
+                  "text-xs px-2 py-1 rounded-md font-medium flex items-center gap-1 cursor-pointer",
+                  name === '欧阳春晓' ? "bg-red-50 text-red-500" : (name === '王梓轩' ? "bg-purple-50 text-purple-500" : "bg-red-50 text-red-500")
+                )}
+              >
+                重点单
+                <span className={cn(
+                  "w-3 h-3 rounded-full flex items-center justify-center font-bold text-[8px] leading-none",
+                  name === '欧阳春晓' ? "bg-red-200" : (name === '王梓轩' ? "bg-purple-200" : "bg-red-200")
+                )}>?</span>
+              </button>
+              {showAIPopup && (
+                <div 
+                  className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-20 whitespace-nowrap bg-gray-800 text-white text-[10px] p-2 rounded-lg shadow-xl text-center"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                >
+                  AI智能分类
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <span className="text-xs px-2 py-1 rounded-md font-medium bg-gray-100 text-gray-500">
+              常规单
+            </span>
+          )}
+
+          {age && (
+            <span className="text-xs px-2 py-1 rounded-md font-medium bg-gray-100 text-gray-500">
+              {age}
+            </span>
+          )}
+
+          {stage && (
+            <span className="text-xs px-2 py-1 rounded-md font-medium bg-gray-100 text-gray-500">
+              {stage}
+            </span>
+          )}
         </div>
-        <div className="flex space-x-3">
+        <div className="flex space-x-3 shrink-0 ml-2">
           <button
             onClick={(e) => {
               e.preventDefault();

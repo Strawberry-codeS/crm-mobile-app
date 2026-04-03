@@ -36,7 +36,7 @@ const tabData: Record<string, CustomerData[]> = {
     新分配客户: [
         {
             name: '欧阳春晓',
-            tags: ['3天待跟进2次', '线上-抖音表单'],
+            tags: ['⏰ 30天未关单回收', '需3天内跟进2次', '线上-抖音表单'],
             color: 'red',
             timeText: '首次：15:00后超时',
             timeStatus: 'urgent',
@@ -46,7 +46,7 @@ const tabData: Record<string, CustomerData[]> = {
         },
         {
             name: '王梓轩',
-            tags: ['3天待跟进2次', '线上-抖音-活动'],
+            tags: ['⏰ 30天未关单回收', '需3天内跟进2次', '线上-抖音-活动'],
             color: 'orange',
             timeText: '首次：25:00后超时',
             timeStatus: 'warning',
@@ -56,7 +56,7 @@ const tabData: Record<string, CustomerData[]> = {
         },
         {
             name: '欧阳小明',
-            tags: ['3天待跟进2次', '线下-口碑'],
+            tags: ['⏰ 30天未关单回收', '需3天内跟进2次', '线下-口碑'],
             color: 'green',
             timeText: '首次：30:00后超时',
             timeStatus: 'success',
@@ -66,7 +66,7 @@ const tabData: Record<string, CustomerData[]> = {
         },
         {
             name: '陈杰森',
-            tags: ['2天待跟进1次', '线上-美团-活动'],
+            tags: ['⏰ 30天未关单回收', '需2天内跟进1次', '线上-美团-活动'],
             color: 'red',
             timeText: '今日18:00后超时',
             timeStatus: 'urgent',
@@ -78,7 +78,7 @@ const tabData: Record<string, CustomerData[]> = {
     待继续跟进: [
         {
             name: '张三的家长',
-            tags: ['3天待跟进2次', '小红书-活码'],
+            tags: ['⏰ 30天未关单回收', '需3天内跟进2次', '小红书-活码'],
             color: 'red',
             timeText: '今日22:00跟进',
             timeStatus: 'urgent',
@@ -142,7 +142,7 @@ const tabData: Record<string, CustomerData[]> = {
     重点客户: [
         {
             name: '萱萱',
-            tags: ['3天待跟进2次', '小红书-活码'],
+            tags: ['⏰ 30天未关单回收', '需3天内跟进2次', '小红书-活码'],
             color: 'red',
             timeText: '首次：15:00后超时',
             timeStatus: 'urgent',
@@ -152,7 +152,7 @@ const tabData: Record<string, CustomerData[]> = {
         },
         {
             name: '欧阳春晓',
-            tags: ['3天待跟进2次', '线上-抖音表单'],
+            tags: ['⏰ 30天未关单回收', '需3天内跟进2次', '线上-抖音表单'],
             color: 'red',
             timeText: '今日22:00跟进',
             timeStatus: 'urgent',
@@ -420,7 +420,8 @@ function CustomerCard({ id, name, tags, color, timeText, timeStatus, task, taskD
     /* 生成智能标签列表 */
     const computedTags: { text: string; isUrgentBadge: boolean }[] = [];
     if (follow_up_period_days && min_follow_ups_required) {
-        computedTags.push({ text: `${follow_up_period_days}天待跟进${min_follow_ups_required}次`, isUrgentBadge: true });
+        computedTags.push({ text: `⏰ 30天未关单回收`, isUrgentBadge: false });
+        computedTags.push({ text: `需${follow_up_period_days}天内跟进${min_follow_ups_required}次`, isUrgentBadge: true });
     }
     tags.forEach(t => computedTags.push({ text: t, isUrgentBadge: false }));
 
@@ -459,17 +460,19 @@ function CustomerCard({ id, name, tags, color, timeText, timeStatus, task, taskD
                             key={i}
                             className={cn(
                                 'text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0',
-                                tag.isUrgentBadge
-                                    ? 'bg-red-500 text-white'
-                                    : tag.text.includes('小红书')
-                                        ? 'bg-red-100 text-red-600'
-                                        : tag.text.includes('抖音')
-                                            ? 'bg-violet-100 text-violet-600'
-                                            : tag.text.includes('演示') || tag.text.includes('试听')
-                                                ? 'bg-purple-100 text-purple-600'
-                                                : tag.text.includes('线下') || tag.text.includes('地推')
-                                                    ? 'bg-blue-100 text-blue-600'
-                                                    : 'bg-gray-100 text-gray-600',
+                                tag.text.includes('未关单回收')
+                                    ? 'bg-red-50 text-red-500 border border-red-300'
+                                    : tag.text.includes('待跟进') || tag.text.includes('天内跟进') || tag.text.includes('跟进2次')
+                                        ? 'bg-red-500 text-white border border-red-500'
+                                        : tag.text.includes('小红书')
+                                            ? 'bg-red-100 text-red-600'
+                                            : tag.text.includes('抖音')
+                                                ? 'bg-violet-100 text-violet-600'
+                                                : tag.text.includes('演示') || tag.text.includes('试听')
+                                                    ? 'bg-purple-100 text-purple-600'
+                                                    : tag.text.includes('线下') || tag.text.includes('地推')
+                                                        ? 'bg-blue-100 text-blue-600'
+                                                        : 'bg-gray-100 text-gray-600',
                             )}
                         >
                             {tag.text}
