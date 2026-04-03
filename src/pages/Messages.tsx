@@ -17,7 +17,7 @@ export default function Messages() {
 
       <div className="p-4">
         {/* Quick Access Grid */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="flex justify-around mb-6 px-8">
           <div className="flex flex-col items-center">
             <div className="w-14 h-14 bg-red-100 rounded-2xl flex items-center justify-center text-red-500 mb-2 relative">
               <Clock size={24} />
@@ -31,13 +31,6 @@ export default function Messages() {
               <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-white text-xs flex items-center justify-center border-2 border-white">5</div>
             </div>
             <span className="text-xs text-gray-600">待办提醒</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-500 mb-2 relative">
-              <User size={24} />
-              <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full border-2 border-white"></div>
-            </div>
-            <span className="text-xs text-gray-600">客户动态</span>
           </div>
         </div>
 
@@ -62,14 +55,6 @@ export default function Messages() {
             title="待办提醒"
             time="09:15"
             content="今日下午5：00欧阳春晓试听，请及时跟进"
-            onClick={() => navigate('/customers/1')}
-          />
-          <MessageCard
-            icon={<FileText size={20} />}
-            iconBg="bg-blue-100 text-blue-500"
-            title="客户新动态"
-            time="昨天"
-            content="张三刚刚购买了抖音小课包"
             onClick={() => navigate('/customers/1')}
           />
         </div>
