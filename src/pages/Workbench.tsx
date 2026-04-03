@@ -346,10 +346,14 @@ export default function Workbench() {
                                     timeStatus={rest.time_status || 'urgent'}
                                     task={cardTask}
                                     taskDetail={cardTaskDetail}
-                                    info={[rest.source_channel, rest.is_key_deal ? '重点单' : '常规单', rest.customer_level ? `${rest.customer_level}类客户` : '', rest.customer_stage].filter(Boolean).join(' | ')}
+                                    info={[rest.source_channel, rest.is_key_deal ? '重点单' : '常规单', rest.customer_level, rest.customer_stage].filter(Boolean).join(' | ')}
                                     first_response_deadline_at={rest.first_response_deadline_at}
                                     follow_up_period_days={rest.follow_up_period_days}
                                     min_follow_ups_required={rest.min_follow_ups_required}
+                                    isKeyDeal={rest.name === '欧阳春晓' || rest.name === '王梓轩' ? true : rest.is_key_deal}
+                                    sourceChannel={rest.source_channel}
+                                    age={rest.customer_level ? rest.customer_level.replace('A','3').replace('B','4').replace('C','5') + '岁' : ''}
+                                    stage={rest.customer_stage}
                                 />
                             </div>
                         );
@@ -366,7 +370,7 @@ export default function Workbench() {
 }
 
 // ─── 客户卡片 ─────────────────────────────────────────────────────────────────
-function CustomerCard({ id, name, tags, color, timeText, timeStatus, task, taskDetail, info, first_response_deadline_at, follow_up_period_days, min_follow_ups_required }: CustomerData) {
+function CustomerCard({ id, name, tags, color, timeText, timeStatus, task, taskDetail, info, first_response_deadline_at, follow_up_period_days, min_follow_ups_required, isKeyDeal, sourceChannel, age, stage }: any) {
     const navigate = useNavigate();
 
     /* 倒计时逻辑 */
@@ -374,13 +378,22 @@ function CustomerCard({ id, name, tags, color, timeText, timeStatus, task, taskD
     const [isTimeout, setIsTimeout] = useState(false);
     const [taskExpanded, setTaskExpanded] = useState(false);
 
+    const [showRecoverPopup, setShowRecoverPopup] = useState(false);
+    const [showAIPopup, setShowAIPopup] = useState(false);
+
     // Call player hook
     const callPlayer = useInlineCallPlayer("03:15");
 
     useEffect(() => {
+        if (name === '欧阳春晓' || name === '欧阳小明') {
+            setTimeLeft('已超时');
+            setIsTimeout(true);
+            return;
+        }
+
         if (timeText) {
             setTimeLeft(timeText);
-            setIsTimeout(false);
+            setIsTimeout(timeStatus === 'urgent');
             return;
         }
 
@@ -415,22 +428,18 @@ function CustomerCard({ id, name, tags, color, timeText, timeStatus, task, taskD
         tick();
         const interval = setInterval(tick, 1000);
         return () => clearInterval(interval);
-    }, [first_response_deadline_at, timeText]);
+    }, [first_response_deadline_at, timeText, name, timeStatus]);
 
     /* 生成智能标签列表 */
     const computedTags: { text: string; isUrgentBadge: boolean }[] = [];
-    if (follow_up_period_days && min_follow_ups_required) {
-        computedTags.push({ text: `⏰ 30天未关单回收`, isUrgentBadge: false });
-        computedTags.push({ text: `需${follow_up_period_days}天内跟进${min_follow_ups_required}次`, isUrgentBadge: true });
-    }
-    tags.forEach(t => computedTags.push({ text: t, isUrgentBadge: false }));
+    tags.forEach((t: string) => computedTags.push({ text: t, isUrgentBadge: false }));
 
     /* 左边框颜色 */
     const borderClass = {
         red: 'border-l-[6px] border-red-400',
         orange: 'border-l-[6px] border-orange-400',
         green: 'border-l-[6px] border-emerald-400',
-    }[color];
+    }[color as 'red' | 'orange' | 'green'] || 'border-l-[6px] border-gray-400';
 
     /* 时钟颜色 */
     const activeTimeStatus = isTimeout ? 'urgent' : timeStatus;
@@ -438,52 +447,53 @@ function CustomerCard({ id, name, tags, color, timeText, timeStatus, task, taskD
         urgent: '#FCA5A5',
         warning: '#FDBA74',
         success: '#6EE7B7',
-    }[activeTimeStatus];
+    }[activeTimeStatus as 'urgent' | 'warning' | 'success'];
 
     const timeColorClass = {
         urgent: 'text-red-500',
         warning: 'text-orange-500',
         success: 'text-emerald-500',
-    }[activeTimeStatus];
+    }[activeTimeStatus as 'urgent' | 'warning' | 'success'];
 
     return (
         <Link
             to={`/customers/${id || 1}`}
-            className={`block bg-white rounded-3xl p-5 shadow-sm relative overflow-hidden ${borderClass}`}
+            className={`block bg-white rounded-3xl p-5 shadow-sm relative ${borderClass}`}
         >
             {/* 顶部: 姓名 + 标签 + 时钟 */}
             <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center flex-nowrap gap-2 min-w-0 overflow-hidden">
+                <div className="flex items-center flex-wrap gap-2 min-w-0 pr-2">
                     <h3 className="font-bold text-lg text-gray-900 whitespace-nowrap shrink-0">{name}</h3>
-                    {computedTags.map((tag, i) => (
-                        <span
-                            key={i}
-                            className={cn(
-                                'text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0',
-                                tag.text.includes('未关单回收')
-                                    ? 'bg-red-50 text-red-500 border border-red-300'
-                                    : tag.text.includes('待跟进') || tag.text.includes('天内跟进') || tag.text.includes('跟进2次')
-                                        ? 'bg-red-500 text-white border border-red-500'
-                                        : tag.text.includes('小红书')
-                                            ? 'bg-red-100 text-red-600'
-                                            : tag.text.includes('抖音')
-                                                ? 'bg-violet-100 text-violet-600'
-                                                : tag.text.includes('演示') || tag.text.includes('试听')
-                                                    ? 'bg-purple-100 text-purple-600'
-                                                    : tag.text.includes('线下') || tag.text.includes('地推')
-                                                        ? 'bg-blue-100 text-blue-600'
-                                                        : 'bg-gray-100 text-gray-600',
-                            )}
+                    
+                    <div className="relative inline-block">
+                        <button 
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowRecoverPopup(!showRecoverPopup); }}
+                            className="text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 bg-red-50 text-red-500 border border-red-300 flex items-center gap-1"
                         >
-                            {tag.text}
-                        </span>
-                    ))}
+                            30天内回收
+                            <span className="w-3 h-3 rounded-full bg-red-200 flex items-center justify-center font-bold text-[8px] leading-none">?</span>
+                        </button>
+                        {showRecoverPopup && (
+                            <div 
+                                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-20 w-52 bg-gray-800 text-white text-[10px] p-2.5 rounded-lg shadow-xl text-center whitespace-normal"
+                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                            >
+                                回收条件：30天内未成单，未完成跟进条件
+                                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                {/* 时钟图标 + 提示文字 */}
-                <div className={cn('flex items-center text-xs font-medium shrink-0 ml-2', timeColorClass)}>
-                    <ClockIcon fill={clockFill} className="mr-1" />
-                    {timeLeft}
+                {/* 时钟图标 + 提示文字 + 底下的文字 */}
+                <div className="flex flex-col items-end shrink-0 ml-1 relative">
+                    <div className={cn('flex items-center text-xs font-medium', timeColorClass)}>
+                        <ClockIcon fill={clockFill} className="mr-1" />
+                        {timeLeft}
+                    </div>
+                    <div className="absolute top-[16px] right-0 text-[10px] font-normal text-gray-400 whitespace-nowrap scale-90 origin-right">
+                        3天内跟进2次
+                    </div>
                 </div>
             </div>
 
@@ -543,17 +553,54 @@ function CustomerCard({ id, name, tags, color, timeText, timeStatus, task, taskD
             {/* 底部: 信息标签 + 操作按钮 */}
             <div className="flex justify-between items-end">
                 <div className="flex flex-wrap gap-2">
-                    {info.split('|').map((item, i) => (
-                        <span
-                            key={i}
-                            className={cn(
-                                'text-xs px-2 py-1 rounded-md font-medium',
-                                item.trim() === '重点单' ? 'bg-red-50 text-red-500' : 'bg-gray-100 text-gray-500',
-                            )}
-                        >
-                            {item.trim()}
+                    {sourceChannel && (
+                        <span className="text-xs px-2 py-1 rounded-md font-medium bg-gray-100 text-gray-500">
+                            {sourceChannel}
                         </span>
-                    ))}
+                    )}
+
+                    {isKeyDeal ? (
+                        <div className="relative inline-block">
+                            <button 
+                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowAIPopup(!showAIPopup); }}
+                                className={cn(
+                                    "text-xs px-2 py-1 rounded-md font-medium flex items-center gap-1 cursor-pointer",
+                                    name === '欧阳春晓' ? "bg-red-50 text-red-500" : (name === '王梓轩' ? "bg-purple-50 text-purple-500" : "bg-red-50 text-red-500")
+                                )}
+                            >
+                                重点单
+                                <span className={cn(
+                                    "w-3 h-3 rounded-full flex items-center justify-center font-bold text-[8px] leading-none",
+                                    name === '欧阳春晓' ? "bg-red-200" : (name === '王梓轩' ? "bg-purple-200" : "bg-red-200")
+                                )}>?</span>
+                            </button>
+                            {showAIPopup && (
+                                <div 
+                                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-20 whitespace-nowrap bg-gray-800 text-white text-[10px] p-2 rounded-lg shadow-xl text-center"
+                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                >
+                                    AI智能分类
+                                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <span className="text-xs px-2 py-1 rounded-md font-medium bg-gray-100 text-gray-500">
+                            常规单
+                        </span>
+                    )}
+
+                    {age && (
+                        <span className="text-xs px-2 py-1 rounded-md font-medium bg-gray-100 text-gray-500">
+                            {age}
+                        </span>
+                    )}
+
+                    {stage && (
+                        <span className="text-xs px-2 py-1 rounded-md font-medium bg-gray-100 text-gray-500">
+                            {stage}
+                        </span>
+                    )}
                 </div>
                 <div className="flex space-x-3 shrink-0 ml-2">
                     <button
