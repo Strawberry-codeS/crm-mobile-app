@@ -578,25 +578,22 @@ function CustomerCard({ id, name, tags, color, timeText, timeStatus, task, taskD
                         <div className="relative inline-block">
                             <button 
                                 onClick={(e) => { 
-                                    if (name === '欧阳春晓' || name === '王梓轩') {
+                                    if (name === '王梓轩') {
                                         e.preventDefault(); e.stopPropagation(); setShowAIPopup(!showAIPopup); 
                                     }
                                 }}
                                 className={cn(
                                     "text-xs px-2 py-1 rounded-md font-medium flex items-center gap-1",
-                                    (name === '欧阳春晓' || name === '王梓轩') ? "cursor-pointer" : "",
-                                    name === '欧阳春晓' ? "bg-red-50 text-red-500" : (name === '王梓轩' ? "bg-purple-50 text-purple-500" : "bg-red-50 text-red-500")
+                                    name === '王梓轩' ? "cursor-pointer" : "",
+                                    name === '王梓轩' ? "bg-purple-50 text-purple-500" : "bg-red-50 text-red-500"
                                 )}
                             >
                                 重点单
-                                {(name === '欧阳春晓' || name === '王梓轩') && (
-                                    <span className={cn(
-                                        "w-3 h-3 rounded-full flex items-center justify-center font-bold text-[8px] leading-none",
-                                        name === '欧阳春晓' ? "bg-red-200" : "bg-purple-200"
-                                    )}>?</span>
+                                {name === '王梓轩' && (
+                                    <span className="w-3 h-3 rounded-full flex items-center justify-center font-bold text-[8px] leading-none bg-purple-200">?</span>
                                 )}
                             </button>
-                            {showAIPopup && (name === '欧阳春晓' || name === '王梓轩') && (
+                            {showAIPopup && name === '王梓轩' && (
                                 <div 
                                     className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-20 whitespace-nowrap bg-gray-800 text-white text-[10px] p-2 rounded-lg shadow-xl text-center"
                                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
