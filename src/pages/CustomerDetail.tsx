@@ -402,9 +402,9 @@ function StageConfirmModal({
 
 function WeComFlowView({ wecomFlows }: { wecomFlows: any[] }) {
   const displayFlows = wecomFlows.length > 0 ? wecomFlows : [
-    { id: 1, created_at: '2023-12-28T14:20:00', flow_type: '流转至', to_staff_id: '顾老师', note: '主动添加用户', stage_at_time: '用户 已全款' },
-    { id: 2, created_at: '2023-11-15T09:45:00', flow_type: '流转至', to_staff_id: '李顾问', note: '主动添加用户', stage_at_time: '用户 承诺上门, 商机分配' },
-    { id: 3, created_at: '2023-10-01T10:00:00', flow_type: '初始分配', to_staff_id: '果媛', note: '用户主动添加', stage_at_time: '用户通过 线上渠道-抖音-阅读大冒险 (活动)' }
+    { id: 1, created_at: '2023-12-28T14:20:00', flow_type: '流转至', to_staff_id: '顾老师', note: '在职继承', stage_at_time: '用户 已全款' },
+    { id: 2, created_at: '2023-11-15T09:45:00', flow_type: '流转至', to_staff_id: '李顾问', note: '离职继承', stage_at_time: '用户 承诺上门, 商机分配' },
+    { id: 3, created_at: '2023-10-01T10:00:00', flow_type: '初始分配', to_staff_id: '果媛', note: '用户主动扫码添加', stage_at_time: '未承诺' }
   ];
 
   return (
@@ -424,11 +424,15 @@ function WeComFlowView({ wecomFlows }: { wecomFlows: any[] }) {
               </div>
               <div className="flex justify-between items-center text-sm text-gray-600 mb-3">
                 <span>{flow.note}</span>
-                {flow.flow_type === '初始分配' && <span className="bg-violet-200 text-violet-700 text-[10px] px-2 py-1 rounded-full flex items-center"><Edit2 size={10} className="mr-1" />话术推荐</span>}
               </div>
               {flow.stage_at_time && (
                 <div className="flex items-center text-xs text-gray-500 bg-white p-2 rounded-lg border border-gray-100">
                   <span className="text-gray-400 mr-1 flex items-center justify-center w-4 h-4 rounded-full bg-gray-100 disabled text-[10px]">★</span> 阶段: {flow.stage_at_time}
+                </div>
+              )}
+              {flow.flow_type === '初始分配' && (
+                <div className="text-[10px] text-gray-400 mt-2">
+                  渠道：线上渠道-抖音-活动
                 </div>
               )}
             </div>
