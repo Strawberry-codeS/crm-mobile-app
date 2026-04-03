@@ -498,13 +498,16 @@ function NotesView({ notes }: { notes: any[] }) {
       id: 1, created_at: new Date().toISOString(), note_type: '电话', content: '"家长询问外教资质及课程进度，对目前的试听时间比较满意，考虑下周报名。"', call_status: '已接通', duration_seconds: '12:45'
     },
     {
-      id: 2, created_at: new Date(Date.now() - 86400000).toISOString(), note_type: '微信发送资料', content: '', attachment: '自然拼读.PDF', attachment_size: '2.4 MB', attachment_status: '已查收'
+      id: 2, created_at: new Date(Date.now() - 86400000).toISOString(), note_type: '企微发送资料', content: '', attachment: '自然拼读.PDF', attachment_size: '2.4 MB', attachment_status: '浏览30秒'
     },
     {
       id: 3, created_at: '2023-10-23T09:12:00', note_type: '小红书下单', content: '¥0.00 试听课', status: 'error'
     },
     {
-      id: 4, created_at: '2023-10-22T15:45:00', note_type: '抖音商城下单', content: '购买课程', price: '¥ 299.00', status: 'success'
+      id: 4, created_at: '2023-10-22T15:45:00', note_type: '抖音商城购买', content: '购买课程', price: '¥ 299.00', status: 'success'
+    },
+    {
+      id: 5, created_at: '2023-10-21T10:30:00', note_type: '大众点评购买', content: '¥9.90 体验课', status: 'error'
     }
   ];
 
@@ -530,9 +533,9 @@ function NotesView({ notes }: { notes: any[] }) {
           if (note.note_type === '电话') {
             icon = <Phone size={16} />;
             color = "bg-purple-100 text-purple-600 border-purple-100 border-opacity-50";
-            title = '详细沟通电话';
+            title = '已呼出电话';
             timeStr = '今日 10:15';
-          } else if (note.note_type === '微信发送资料') {
+          } else if (note.note_type === '企微发送资料') {
             icon = <MessageSquare size={16} />;
             color = "bg-emerald-100 text-emerald-600 border-emerald-100 border-opacity-50";
             timeStr = '昨日 18:20';
@@ -541,10 +544,15 @@ function NotesView({ notes }: { notes: any[] }) {
             color = "bg-red-100 text-red-600 border-red-100 border-opacity-50";
             title = '';
             timeStr = '';
-          } else if (note.note_type === '抖音商城下单') {
+          } else if (note.note_type === '抖音商城购买') {
             icon = <ShoppingCart size={16} />;
             color = "bg-violet-100 text-violet-600 border-violet-100 border-opacity-50";
             timeStr = '10-22 15:45';
+          } else if (note.note_type === '大众点评购买') {
+            icon = <ShoppingBag size={16} />;
+            color = "bg-orange-100 text-orange-600 border-orange-100 border-opacity-50";
+            title = '';
+            timeStr = '';
           }
 
           return (
@@ -560,7 +568,7 @@ function NotesView({ notes }: { notes: any[] }) {
                   {note.content}
                 </div>
               )}
-              {note.note_type === '微信发送资料' && (
+              {note.note_type === '企微发送资料' && (
                 <div className="flex items-center gap-3 bg-white border border-gray-100 p-3 rounded-xl shadow-sm my-2">
                   <div className="bg-red-500 text-white font-bold text-xs p-2 rounded-lg">PDF</div>
                   <div>
@@ -578,15 +586,40 @@ function NotesView({ notes }: { notes: any[] }) {
                     </div>
                     <ChevronRight size={18} className="text-red-300" />
                   </div>
-                  <div className="text-red-400 text-xs font-medium opacity-90">
+                  <div className="text-red-400 text-xs font-medium opacity-90 mb-1">
                     {'10-23 09:12'} · {note.content}
+                  </div>
+                  <div className="text-[10px] text-gray-400 mt-1">
+                    渠道：线上渠道-小红书-团购
                   </div>
                 </div>
               )}
-              {note.note_type === '抖音商城下单' && (
-                <div className="flex justify-between items-center my-2 py-1">
-                  <span className="text-sm text-gray-600">{note.content}</span>
-                  <span className="text-violet-600 font-bold text-lg">{note.price}</span>
+              {note.note_type === '抖音商城购买' && (
+                <div className="my-2">
+                  <div className="flex justify-between items-center py-1">
+                    <span className="text-sm text-gray-600">{note.content}</span>
+                    <span className="text-violet-600 font-bold text-lg">{note.price}</span>
+                  </div>
+                  <div className="text-[10px] text-gray-400">
+                    渠道：线上渠道-抖音-注册
+                  </div>
+                </div>
+              )}
+              {note.note_type === '大众点评购买' && (
+                <div className="bg-orange-50 text-orange-600 p-4 rounded-2xl border border-orange-100 flex flex-col my-2 cursor-pointer shadow-sm active:bg-orange-100 transition-colors">
+                  <div className="flex justify-between items-center mb-1">
+                    <div className="flex items-center font-bold text-[15px]">
+                      <span className="text-orange-500 mr-1.5 text-xs">●</span>
+                      大众点评购买
+                    </div>
+                    <ChevronRight size={18} className="text-orange-300" />
+                  </div>
+                  <div className="text-orange-400 text-xs font-medium opacity-90 mb-1">
+                    {'10-21 10:30'} · {note.content}
+                  </div>
+                  <div className="text-[10px] text-gray-400 mt-1">
+                    渠道：线上渠道-大众点评-团购
+                  </div>
                 </div>
               )}
               {note.call_status && (
