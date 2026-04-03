@@ -543,16 +543,16 @@ function NotesView({ notes }: { notes: any[] }) {
             icon = <ShoppingBag size={16} />;
             color = "bg-red-100 text-red-600 border-red-100 border-opacity-50";
             title = '';
-            timeStr = '10-23 09:12';
+            timeStr = '2025-10-23 09:12';
           } else if (note.note_type === '抖音商城购买') {
             icon = <ShoppingCart size={16} />;
             color = "bg-violet-100 text-violet-600 border-violet-100 border-opacity-50";
-            timeStr = '10-22 15:45';
+            timeStr = '2025-10-22 15:45';
           } else if (note.note_type === '大众点评购买') {
             icon = <ShoppingBag size={16} />;
             color = "bg-orange-100 text-orange-600 border-orange-100 border-opacity-50";
             title = '';
-            timeStr = '10-21 10:30';
+            timeStr = '2025-10-21 10:30';
           }
 
           return (
@@ -587,7 +587,7 @@ function NotesView({ notes }: { notes: any[] }) {
                     <ChevronRight size={18} className="text-red-300" />
                   </div>
                   <div className="text-red-400 text-xs font-medium opacity-90 mb-1">
-                    {'10-23 09:12'} · {note.content}
+                    {'2025-10-23 09:12'} · {note.content}
                   </div>
                   <div className="text-[10px] text-gray-400 mt-1">
                     渠道：线上渠道-小红书-团购
@@ -615,7 +615,7 @@ function NotesView({ notes }: { notes: any[] }) {
                     <ChevronRight size={18} className="text-orange-300" />
                   </div>
                   <div className="text-orange-400 text-xs font-medium opacity-90 mb-1">
-                    {'10-21 10:30'} · {note.content}
+                    {'2025-10-21 10:30'} · {note.content}
                   </div>
                   <div className="text-[10px] text-gray-400 mt-1">
                     渠道：线上渠道-大众点评-团购
