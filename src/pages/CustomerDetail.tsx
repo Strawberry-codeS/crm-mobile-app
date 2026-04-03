@@ -499,19 +499,22 @@ function NotesView({ notes }: { notes: any[] }) {
   const navigate = useNavigate();
   const displayNotes = notes.length > 0 ? notes : [
     {
+      id: 0, created_at: '2025-10-24T10:20:00', note_type: '大众点评购买', content: '500元抵用券', status: 'success', time_display: '2025-10-24 10:20'
+    },
+    {
       id: 1, created_at: new Date().toISOString(), note_type: '电话', content: '"家长询问外教资质及课程进度，对目前的试听时间比较满意，考虑下周报名。"', call_status: '已接通', duration_seconds: '12:45'
     },
     {
       id: 2, created_at: new Date(Date.now() - 86400000).toISOString(), note_type: '企微发送资料', content: '', attachment: '自然拼读.PDF', attachment_size: '2.4 MB', attachment_status: '浏览30秒'
     },
     {
-      id: 3, created_at: '2023-10-23T09:12:00', note_type: '小红书下单', content: '¥0.00 试听课', status: 'error'
+      id: 3, created_at: '2023-10-23T09:12:00', note_type: '小红书下单', content: '¥0.00 试听课', status: 'error', time_display: '2025-10-23 09:12'
     },
     {
-      id: 4, created_at: '2023-10-22T15:45:00', note_type: '抖音商城购买', content: '购买课程', price: '¥ 299.00', status: 'success'
+      id: 4, created_at: '2023-10-22T15:45:00', note_type: '抖音商城购买', content: '购买课程', price: '¥ 299.00', status: 'success', time_display: '2025-10-22 15:45'
     },
     {
-      id: 5, created_at: '2023-10-21T10:30:00', note_type: '大众点评购买', content: '¥9.90 体验课', status: 'error'
+      id: 5, created_at: '2023-10-21T10:30:00', note_type: '大众点评购买', content: '¥9.90 体验课', status: 'error', time_display: '2025-10-21 10:30'
     }
   ];
 
@@ -547,16 +550,16 @@ function NotesView({ notes }: { notes: any[] }) {
             icon = <ShoppingBag size={16} />;
             color = "bg-red-100 text-red-600 border-red-100 border-opacity-50";
             title = '';
-            timeStr = '2025-10-23 09:12';
+            timeStr = note.time_display || '2025-10-23 09:12';
           } else if (note.note_type === '抖音商城购买') {
             icon = <ShoppingCart size={16} />;
             color = "bg-violet-100 text-violet-600 border-violet-100 border-opacity-50";
-            timeStr = '2025-10-22 15:45';
+            timeStr = note.time_display || '2025-10-22 15:45';
           } else if (note.note_type === '大众点评购买') {
             icon = <ShoppingBag size={16} />;
             color = "bg-orange-100 text-orange-600 border-orange-100 border-opacity-50";
             title = '';
-            timeStr = '2025-10-21 10:30';
+            timeStr = note.time_display || '2025-10-21 10:30';
           }
 
           return (
@@ -591,7 +594,7 @@ function NotesView({ notes }: { notes: any[] }) {
                     <ChevronRight size={18} className="text-red-300" />
                   </div>
                   <div className="text-red-400 text-xs font-medium opacity-90 mb-1">
-                    {'2025-10-23 09:12'} · {note.content}
+                    {note.time_display || '2025-10-23 09:12'} · {note.content}
                   </div>
                   <div className="text-[10px] text-gray-400 mt-1">
                     渠道：线上渠道-小红书-团购
@@ -619,7 +622,7 @@ function NotesView({ notes }: { notes: any[] }) {
                     <ChevronRight size={18} className="text-orange-300" />
                   </div>
                   <div className="text-orange-400 text-xs font-medium opacity-90 mb-1">
-                    {'2025-10-21 10:30'} · {note.content}
+                    {note.time_display || '2025-10-21 10:30'} · {note.content}
                   </div>
                   <div className="text-[10px] text-gray-400 mt-1">
                     渠道：线上渠道-大众点评-团购
