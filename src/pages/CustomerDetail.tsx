@@ -543,7 +543,7 @@ function NotesView({ notes }: { notes: any[] }) {
             icon = <ShoppingBag size={16} />;
             color = "bg-red-100 text-red-600 border-red-100 border-opacity-50";
             title = '';
-            timeStr = '';
+            timeStr = '10-23 09:12';
           } else if (note.note_type === '抖音商城购买') {
             icon = <ShoppingCart size={16} />;
             color = "bg-violet-100 text-violet-600 border-violet-100 border-opacity-50";
@@ -552,7 +552,7 @@ function NotesView({ notes }: { notes: any[] }) {
             icon = <ShoppingBag size={16} />;
             color = "bg-orange-100 text-orange-600 border-orange-100 border-opacity-50";
             title = '';
-            timeStr = '';
+            timeStr = '10-21 10:30';
           }
 
           return (
