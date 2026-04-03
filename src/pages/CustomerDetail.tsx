@@ -16,12 +16,14 @@ export default function CustomerDetail() {
   const [showAIPopup, setShowAIPopup] = useState(false);
   const activeStudent = students[activeStudentIndex];
 
+  const isKeyDeal = customer?.is_key_deal || ['欧阳春晓', '王梓轩', '李子涵'].includes(customer?.name || '');
+
   const profile = {
     name: customer?.name ?? '加载中...',
     avatar: customer?.avatar_url ?? `https://picsum.photos/seed/${id}/80/80`,
     tags: customer ? [
       ...(customer.customer_level ? [`${customer.customer_level}类客户`] : []),
-      ...(customer.is_key_deal ? ['重点单'] : []),
+      ...(isKeyDeal ? ['重点单'] : []),
     ] : [],
     age: activeStudent?.age ? `${activeStudent.age}岁` : (activeStudent?.grade ?? ''),
     phone: customer?.phone ?? '',
