@@ -96,6 +96,26 @@ export const MOCK_CUSTOMERS: Customer[] = [
     created_at: now.toISOString(), updated_at: now.toISOString(), 
     phones: [{ number: '150-1111-2222', type: 'primary' }], avatar_url: null, assigned_to: null, focus_dimensions: null, custom_tags: null
   },
+  { 
+    id: 'c10', name: '李子涵', phone: '150-2222-3333', customer_level: 'A', is_key_deal: true, 
+    product_line: '瑞思英语', source_channel: '线上-抖音表单', intended_campus: '大悦城校区', 
+    customer_stage: '未承诺', tab_category: '重点客户', time_text: '今日14:00跟进', 
+    time_status: 'warning', color: 'orange', pipeline_stage: '接触阶段', 
+    next_follow_up_at: null, demo_appointment_at: null, first_response_deadline_at: null,
+    last_status_change_at: now.toISOString(), follow_up_period_days: 3, min_follow_ups_required: 2,
+    created_at: new Date(now.getTime() - 10000).toISOString(), updated_at: now.toISOString(), 
+    phones: [{ number: '150-2222-3333', type: 'primary' }], avatar_url: null, assigned_to: null, focus_dimensions: null, custom_tags: null
+  },
+  { 
+    id: 'c11', name: '赵依然', phone: '150-3333-4444', customer_level: 'A', is_key_deal: true, 
+    product_line: '瑞思英语', source_channel: '线下-口碑', intended_campus: '大悦城校区', 
+    customer_stage: '承诺上门', tab_category: '重点客户', time_text: '今日10:00跟进', 
+    time_status: 'success', color: 'green', pipeline_stage: '接触阶段', 
+    next_follow_up_at: null, demo_appointment_at: null, first_response_deadline_at: null,
+    last_status_change_at: now.toISOString(), follow_up_period_days: 2, min_follow_ups_required: 1,
+    created_at: new Date(now.getTime() - 20000).toISOString(), updated_at: now.toISOString(), 
+    phones: [{ number: '150-3333-4444', type: 'primary' }], avatar_url: null, assigned_to: null, focus_dimensions: null, custom_tags: null
+  },
 ];
 
 export const MOCK_STUDENTS: Student[] = [

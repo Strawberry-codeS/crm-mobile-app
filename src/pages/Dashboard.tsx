@@ -479,7 +479,7 @@ export default function Dashboard() {
             }
             
             let isKeyDeal = c.is_key_deal;
-            if (c.name === '欧阳春晓' || c.name === '王梓轩') {
+            if (c.name === '欧阳春晓' || c.name === '王梓轩' || c.name === '李子涵') {
                 isKeyDeal = true;
             }
             
@@ -493,6 +493,16 @@ export default function Dashboard() {
           }).sort((a, b) => {
             if (a.isTimeout && !b.isTimeout) return -1;
             if (!a.isTimeout && b.isTimeout) return 1;
+
+            const purpleNames = ['王梓轩', '李子涵'];
+            const aIsRed = a.isKeyDeal && !purpleNames.includes(a.name);
+            const aIsPurple = a.isKeyDeal && purpleNames.includes(a.name);
+            const bIsRed = b.isKeyDeal && !purpleNames.includes(b.name);
+            const bIsPurple = b.isKeyDeal && purpleNames.includes(b.name);
+
+            if (aIsRed && bIsPurple) return -1;
+            if (aIsPurple && bIsRed) return 1;
+
             return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
           }).map((c) => {
             const demoTaskMap: Record<string, { task: string; taskDetail: string }> = {
@@ -1158,22 +1168,22 @@ function TaskCard({ id, name, tags, color = 'red', timeText, timeStatus = 'urgen
                 <div className="relative inline-block">
                     <button 
                         onClick={(e) => { 
-                            if (name === '王梓轩') {
+                            if (['王梓轩', '李子涵'].includes(name)) {
                                 e.preventDefault(); e.stopPropagation(); setShowAIPopup(!showAIPopup); 
                             }
                         }}
                         className={cn(
                             "text-xs px-2 py-1 rounded-md font-medium flex items-center gap-1",
-                            name === '王梓轩' ? "cursor-pointer" : "",
-                            name === '王梓轩' ? "bg-purple-50 text-purple-500" : "bg-red-50 text-red-500"
+                            ['王梓轩', '李子涵'].includes(name) ? "cursor-pointer" : "",
+                            ['王梓轩', '李子涵'].includes(name) ? "bg-purple-50 text-purple-500" : "bg-red-50 text-red-500"
                         )}
                     >
                         重点单
-                        {name === '王梓轩' && (
+                        {['王梓轩', '李子涵'].includes(name) && (
                             <span className="w-3 h-3 rounded-full flex items-center justify-center font-bold text-[8px] leading-none bg-purple-200">?</span>
                         )}
                     </button>
-                    {showAIPopup && name === '王梓轩' && (
+                    {showAIPopup && ['王梓轩', '李子涵'].includes(name) && (
                         <div 
                             className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-20 whitespace-nowrap bg-gray-800 text-white text-[10px] p-2 rounded-lg shadow-xl text-center"
                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}

@@ -161,8 +161,6 @@ export default function CustomerList() {
         </button>
       </div>
 
-      {/* Secondary Filters removed per user request */}
-
       {/* List */}
       <div className="flex-1 space-y-3 overflow-y-auto pb-20 no-scrollbar">
         {loading && <div className="text-center py-10 text-gray-400 text-sm animate-pulse">加载中...</div>}
@@ -177,7 +175,7 @@ export default function CustomerList() {
           }
 
           let isKeyDeal = c.is_key_deal;
-          if (c.name === '欧阳春晓' || c.name === '王梓轩') {
+          if (c.name === '欧阳春晓' || c.name === '王梓轩' || c.name === '李子涵') {
             isKeyDeal = true;
           }
 
@@ -435,22 +433,22 @@ function CustomerItem({ id, name, task, sourceChannel, isKeyDeal, age, stage, ti
             <div className="relative inline-block">
               <button 
                 onClick={(e) => { 
-                  if (name === '王梓轩') {
+                  if (['王梓轩', '李子涵'].includes(name)) {
                     e.preventDefault(); e.stopPropagation(); setShowAIPopup(!showAIPopup); 
                   }
                 }}
                 className={cn(
                   "text-xs px-2 py-1 rounded-md font-medium flex items-center gap-1",
-                  name === '王梓轩' ? "cursor-pointer" : "",
-                  name === '王梓轩' ? "bg-purple-50 text-purple-500" : "bg-red-50 text-red-500"
+                  ['王梓轩', '李子涵'].includes(name) ? "cursor-pointer" : "",
+                  ['王梓轩', '李子涵'].includes(name) ? "bg-purple-50 text-purple-500" : "bg-red-50 text-red-500"
                 )}
               >
                 重点单
-                {name === '王梓轩' && (
+                {['王梓轩', '李子涵'].includes(name) && (
                   <span className="w-3 h-3 rounded-full flex items-center justify-center font-bold text-[8px] leading-none bg-purple-200">?</span>
                 )}
               </button>
-              {showAIPopup && name === '王梓轩' && (
+              {showAIPopup && ['王梓轩', '李子涵'].includes(name) && (
                 <div 
                   className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-20 whitespace-nowrap bg-gray-800 text-white text-[10px] p-2 rounded-lg shadow-xl text-center"
                   onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
