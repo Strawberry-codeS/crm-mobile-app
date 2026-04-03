@@ -167,15 +167,11 @@ export default function CustomerList() {
       <div className="flex-1 space-y-3 overflow-y-auto pb-20 no-scrollbar">
         {loading && <div className="text-center py-10 text-gray-400 text-sm animate-pulse">加载中...</div>}
         {!loading && customers.length === 0 && <div className="text-center py-10 text-gray-400 text-sm">暂无客户数据</div>}
-        {!loading && customers.map((c) => {
+        {!loading && customers.map(c => {
           let cardTime = c.time_text ?? '';
           let cardTimeStatus = (c.time_status as string) ?? 'success';
 
-          // Inject hardcoded overrides for specific demo users to match Workbench exactly
-          if (c.name === '欧阳春晓') {
-            cardTime = '已超时';
-            cardTimeStatus = 'urgent';
-          } else if (c.name === '欧阳小明') {
+          if (c.name === '欧阳春晓' || c.name === '欧阳小明') {
             cardTime = '已超时';
             cardTimeStatus = 'urgent';
           }
@@ -191,6 +187,14 @@ export default function CustomerList() {
           else if (c.customer_level === 'C') age = '5岁';
           else if (c.customer_level) age = `${c.customer_level}岁`;
 
+          return { ...c, cardTime, cardTimeStatus, isKeyDeal, age };
+        }).sort((a, b) => {
+          const aTimeout = a.cardTimeStatus === 'urgent' || a.cardTime === '已超时';
+          const bTimeout = b.cardTimeStatus === 'urgent' || b.cardTime === '已超时';
+          if (aTimeout && !bTimeout) return -1;
+          if (!aTimeout && bTimeout) return 1;
+          return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+        }).map((c) => {
           return (
             <CustomerItem
               key={c.id}
@@ -198,12 +202,12 @@ export default function CustomerList() {
               name={c.name}
               task={c.customer_stage ? `用户纪要：${c.customer_stage}` : '用户纪要：跟进'}
               sourceChannel={c.source_channel}
-              isKeyDeal={isKeyDeal}
-              age={age}
+              isKeyDeal={c.isKeyDeal}
+              age={c.age}
               stage={c.customer_stage}
-              time={cardTime}
+              time={c.cardTime}
               color={(c.color as string) ?? 'gray'}
-              timeStatus={cardTimeStatus}
+              timeStatus={c.cardTimeStatus}
             />
           );
         })}
@@ -430,19 +434,26 @@ function CustomerItem({ id, name, task, sourceChannel, isKeyDeal, age, stage, ti
           {isKeyDeal ? (
             <div className="relative inline-block">
               <button 
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowAIPopup(!showAIPopup); }}
+                onClick={(e) => { 
+                  if (name === '欧阳春晓' || name === '王梓轩') {
+                    e.preventDefault(); e.stopPropagation(); setShowAIPopup(!showAIPopup); 
+                  }
+                }}
                 className={cn(
-                  "text-xs px-2 py-1 rounded-md font-medium flex items-center gap-1 cursor-pointer",
+                  "text-xs px-2 py-1 rounded-md font-medium flex items-center gap-1",
+                  (name === '欧阳春晓' || name === '王梓轩') ? "cursor-pointer" : "",
                   name === '欧阳春晓' ? "bg-red-50 text-red-500" : (name === '王梓轩' ? "bg-purple-50 text-purple-500" : "bg-red-50 text-red-500")
                 )}
               >
                 重点单
-                <span className={cn(
-                  "w-3 h-3 rounded-full flex items-center justify-center font-bold text-[8px] leading-none",
-                  name === '欧阳春晓' ? "bg-red-200" : (name === '王梓轩' ? "bg-purple-200" : "bg-red-200")
-                )}>?</span>
+                {(name === '欧阳春晓' || name === '王梓轩') && (
+                  <span className={cn(
+                    "w-3 h-3 rounded-full flex items-center justify-center font-bold text-[8px] leading-none",
+                    name === '欧阳春晓' ? "bg-red-200" : "bg-purple-200"
+                  )}>?</span>
+                )}
               </button>
-              {showAIPopup && (
+              {showAIPopup && (name === '欧阳春晓' || name === '王梓轩') && (
                 <div 
                   className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-20 whitespace-nowrap bg-gray-800 text-white text-[10px] p-2 rounded-lg shadow-xl text-center"
                   onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
