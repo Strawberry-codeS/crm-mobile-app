@@ -13,14 +13,15 @@ export default function CustomerDetail() {
   const [activeStudentIndex, setActiveStudentIndex] = useState(0);
   const [showAddPhoneModal, setShowAddPhoneModal] = useState(false);
   const [activeStageModal, setActiveStageModal] = useState<'none' | 'demo' | 'visit' | 'enrollment'>('none');
+  const [showAIPopup, setShowAIPopup] = useState(false);
   const activeStudent = students[activeStudentIndex];
 
   const profile = {
     name: customer?.name ?? '加载中...',
     avatar: customer?.avatar_url ?? `https://picsum.photos/seed/${id}/80/80`,
     tags: customer ? [
-      ...(customer.is_key_deal ? ['重点单'] : []),
       ...(customer.customer_level ? [`${customer.customer_level}类客户`] : []),
+      ...(customer.is_key_deal ? ['重点单'] : []),
     ] : [],
     age: activeStudent?.age ? `${activeStudent.age}岁` : (activeStudent?.grade ?? ''),
     phone: customer?.phone ?? '',
@@ -73,14 +74,43 @@ export default function CustomerDetail() {
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <h2 className="text-xl font-bold text-gray-900">{profile.name}</h2>
-                  {profile.tags.map(tag => (
-                    <span key={tag} className={cn(
-                      "text-[10px] px-1.5 py-0.5 rounded border",
-                      tag === '重点单' ? "bg-red-50 text-red-500 border-red-100" :
+                  {profile.tags.map(tag => {
+                    if (tag === '重点单') {
+                      return (
+                        <div key={tag} className="relative inline-block ml-1">
+                            <button 
+                                onClick={(e) => { 
+                                    e.preventDefault(); e.stopPropagation(); setShowAIPopup(!showAIPopup); 
+                                }}
+                                className={cn(
+                                    "text-[10px] px-1.5 py-0.5 rounded border font-medium flex items-center gap-0.5",
+                                    "cursor-pointer bg-purple-50 text-purple-600 border-purple-100"
+                                )}
+                            >
+                                重点单
+                                <span className="w-2.5 h-2.5 flex items-center justify-center font-bold text-[7px] leading-none bg-purple-200 text-purple-600 rounded-full">?</span>
+                            </button>
+                            {showAIPopup && (
+                                <div 
+                                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-20 whitespace-nowrap bg-gray-800 text-white text-[10px] p-2 rounded-lg shadow-xl text-center"
+                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                >
+                                    AI智能分类
+                                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800" />
+                                </div>
+                            )}
+                        </div>
+                      )
+                    }
+
+                    return (
+                      <span key={tag} className={cn(
+                        "text-[10px] px-1.5 py-0.5 rounded border",
                         tag === 'A类客户' ? "bg-orange-50 text-orange-500 border-orange-100" :
-                          "bg-gray-50 text-gray-500 border-gray-100"
-                    )}>{tag}</span>
-                  ))}
+                            "bg-gray-50 text-gray-500 border-gray-100"
+                      )}>{tag}</span>
+                    )
+                  })}
                 </div>
                 <div className="flex items-center text-gray-500 text-sm mb-2">
                   {profile.phone}
