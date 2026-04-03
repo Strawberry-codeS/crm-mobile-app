@@ -458,6 +458,7 @@ function TagsView({ tags }: { tags: any[] }) {
   ];
 
   const groupedTags = displayTags.reduce((acc, tag) => {
+    if (tag.tag_type === '行为信息') return acc; // Strip behavior info out
     acc[tag.tag_type || '其他标签'] = acc[tag.tag_type || '其他标签'] || [];
     acc[tag.tag_type || '其他标签'].push(tag);
     return acc;
@@ -465,7 +466,6 @@ function TagsView({ tags }: { tags: any[] }) {
 
   const getTagColor = (type: string) => {
     if (type === '基础信息') return 'blue';
-    if (type === '行为信息') return 'pink';
     if (type === '客户阶段信息') return 'orange';
     if (type === '家长关注维度 (多选)') return 'violet';
     if (type === '自定义信息') return 'emerald';
@@ -487,12 +487,6 @@ function TagsView({ tags }: { tags: any[] }) {
           )}
         </TagGroup>
       ))}
-
-      <div className="mb-6">
-        <button className="border border-dashed border-gray-300 text-gray-400 px-4 py-2 rounded-lg text-xs font-medium flex items-center hover:bg-gray-50 transition-colors">
-          <Plus size={14} className="mr-1" /> 添加信息类别
-        </button>
-      </div>
     </div>
   );
 }
