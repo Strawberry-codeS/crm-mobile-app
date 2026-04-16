@@ -325,7 +325,7 @@ function CustomerItem({ id, name, task, sourceChannel, isKeyDeal, age, stage, ti
   const [taskExpanded, setTaskExpanded] = useState(false);
   const callPlayer = useInlineCallPlayer("03:15");
   const [showRecoverPopup, setShowRecoverPopup] = useState(false);
-  const [showAIPopup, setShowAIPopup] = useState(false);
+
 
   let borderClass = "border-l-[6px] border-red-400";
   if (color === 'orange') borderClass = "border-l-[6px] border-orange-400";
@@ -430,34 +430,9 @@ function CustomerItem({ id, name, task, sourceChannel, isKeyDeal, age, stage, ti
           )}
 
           {isKeyDeal ? (
-            <div className="relative inline-block">
-              <button 
-                onClick={(e) => { 
-                  if (['王梓轩', '李子涵'].includes(name)) {
-                    e.preventDefault(); e.stopPropagation(); setShowAIPopup(!showAIPopup); 
-                  }
-                }}
-                className={cn(
-                  "text-xs px-2 py-1 rounded-md font-medium flex items-center gap-1",
-                  ['王梓轩', '李子涵'].includes(name) ? "cursor-pointer" : "",
-                  ['王梓轩', '李子涵'].includes(name) ? "bg-purple-50 text-purple-500" : "bg-red-50 text-red-500"
-                )}
-              >
-                重点单
-                {['王梓轩', '李子涵'].includes(name) && (
-                  <span className="w-3 h-3 rounded-full flex items-center justify-center font-bold text-[8px] leading-none bg-purple-200">?</span>
-                )}
-              </button>
-              {showAIPopup && ['王梓轩', '李子涵'].includes(name) && (
-                <div 
-                  className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-20 whitespace-nowrap bg-gray-800 text-white text-[10px] p-2 rounded-lg shadow-xl text-center"
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                >
-                  AI智能分类
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
-                </div>
-              )}
-            </div>
+            <span className="text-xs px-2 py-1 rounded-md font-medium bg-red-50 text-red-500">
+              重点单
+            </span>
           ) : (
             <span className="text-xs px-2 py-1 rounded-md font-medium bg-gray-100 text-gray-500">
               常规单

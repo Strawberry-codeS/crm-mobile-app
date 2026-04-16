@@ -13,6 +13,21 @@ export default function CustomerDetail() {
   const [activeStudentIndex, setActiveStudentIndex] = useState(0);
   const [showAddPhoneModal, setShowAddPhoneModal] = useState(false);
   const [activeStageModal, setActiveStageModal] = useState<'none' | 'demo' | 'visit' | 'enrollment'>('none');
+  const [isOnCall, setIsOnCall] = useState(false);
+  const [callSeconds, setCallSeconds] = useState(0);
+  const [showCallModal, setShowCallModal] = useState(false);
+  const callTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (isOnCall) {
+      setCallSeconds(0);
+      callTimerRef.current = setInterval(() => setCallSeconds(s => s + 1), 1000);
+    } else {
+      if (callTimerRef.current) clearInterval(callTimerRef.current);
+      setCallSeconds(0);
+    }
+    return () => { if (callTimerRef.current) clearInterval(callTimerRef.current); };
+  }, [isOnCall]);
 
   const activeStudent = students[activeStudentIndex];
 
@@ -29,6 +44,8 @@ export default function CustomerDetail() {
     phone: customer?.phone ?? '',
   };
 
+  const fmtCall = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+
   return (
     <div className="min-h-screen bg-[#F8F7FC] pb-24">
       {/* Navbar */}
@@ -39,6 +56,25 @@ export default function CustomerDetail() {
         <h1 className="text-lg font-bold text-gray-900">客户详情</h1>
         <div className="w-16"></div> {/* Spacer */}
       </div>
+
+      {/* Call Banner */}
+      {isOnCall && (
+        <button
+          onClick={() => setShowCallModal(true)}
+          className="w-full bg-violet-600 px-5 py-3 flex items-center justify-between sticky top-[52px] z-10"
+        >
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-white/70 animate-pulse" />
+            <span className="text-white font-bold text-sm">正在通话</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-white font-mono font-bold text-sm tracking-widest">{fmtCall(callSeconds)}</span>
+            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+              <Phone size={15} className="text-white" />
+            </div>
+          </div>
+        </button>
+      )}
 
       <div className="p-4 space-y-4">
         {/* Family Bar: show existing students and 新增学员 button */}
@@ -198,8 +234,11 @@ export default function CustomerDetail() {
         {/* Action Buttons */}
         <div className="grid grid-cols-4 gap-3">
           <button
-            onClick={() => navigate('add-note', { state: { isCall: true } })}
-            className="flex items-center justify-center gap-1.5 bg-violet-100 text-violet-700 py-3 rounded-xl font-bold hover:bg-violet-200 transition text-sm"
+            onClick={() => setIsOnCall(true)}
+            className={cn(
+              "flex items-center justify-center gap-1.5 py-3 rounded-xl font-bold transition text-sm",
+              isOnCall ? "bg-violet-600 text-white" : "bg-violet-100 text-violet-700 hover:bg-violet-200"
+            )}
           >
             <Phone size={16} /> 电话
           </button>
@@ -249,6 +288,32 @@ export default function CustomerDetail() {
       </div>
 
       {showAddPhoneModal && <AddPhoneModal onClose={() => setShowAddPhoneModal(false)} />}
+
+      {/* Call Modal */}
+      {showCallModal && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center px-6">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowCallModal(false)} />
+          <div className="relative bg-white rounded-3xl w-full max-w-sm p-8 flex flex-col items-center shadow-2xl animate-in zoom-in-95 duration-200">
+            {/* Pulsing ring */}
+            <div className="relative mb-6">
+              <div className="w-20 h-20 rounded-full bg-violet-600 flex items-center justify-center">
+                <Phone size={32} className="text-white" />
+              </div>
+              <div className="absolute inset-0 rounded-full bg-violet-400 opacity-30 animate-ping" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">正在通话中</h2>
+            <p className="text-sm text-gray-400 text-center mb-1">将自动生成咨询纪要，</p>
+            <p className="text-sm text-gray-400 text-center mb-8">并将自动同步对应客户信息</p>
+            <button
+              onClick={() => { setIsOnCall(false); setShowCallModal(false); }}
+              className="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center shadow-lg shadow-red-200 active:bg-red-600 transition-colors"
+            >
+              <Phone size={24} className="text-white rotate-[135deg]" />
+            </button>
+            <span className="mt-3 text-xs text-gray-400">挂断</span>
+          </div>
+        </div>
+      )}
 
       {/* Stage Modals */}
       <StageConfirmModal
