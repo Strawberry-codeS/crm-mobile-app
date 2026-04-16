@@ -13,7 +13,7 @@ export default function CustomerDetail() {
   const [activeStudentIndex, setActiveStudentIndex] = useState(0);
   const [showAddPhoneModal, setShowAddPhoneModal] = useState(false);
   const [activeStageModal, setActiveStageModal] = useState<'none' | 'demo' | 'visit' | 'enrollment'>('none');
-  const [showAIPopup, setShowAIPopup] = useState(false);
+
   const activeStudent = students[activeStudentIndex];
 
   const isKeyDeal = customer?.is_key_deal || ['欧阳春晓', '王梓轩', '李子涵'].includes(customer?.name || '');
@@ -79,29 +79,9 @@ export default function CustomerDetail() {
                   {profile.tags.map(tag => {
                     if (tag === '重点单') {
                       return (
-                        <div key={tag} className="relative inline-block ml-1">
-                            <button 
-                                onClick={(e) => { 
-                                    e.preventDefault(); e.stopPropagation(); setShowAIPopup(!showAIPopup); 
-                                }}
-                                className={cn(
-                                    "text-[10px] px-1.5 py-0.5 rounded border font-medium flex items-center gap-0.5",
-                                    "cursor-pointer bg-purple-50 text-purple-600 border-purple-100"
-                                )}
-                            >
-                                重点单
-                                <span className="w-2.5 h-2.5 flex items-center justify-center font-bold text-[7px] leading-none bg-purple-200 text-purple-600 rounded-full">?</span>
-                            </button>
-                            {showAIPopup && (
-                                <div 
-                                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-20 whitespace-nowrap bg-gray-800 text-white text-[10px] p-2 rounded-lg shadow-xl text-center"
-                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                >
-                                    AI智能分类
-                                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800" />
-                                </div>
-                            )}
-                        </div>
+                        <span key={tag} className="text-[10px] px-1.5 py-0.5 rounded border font-medium bg-red-50 text-red-500 border-red-100 ml-1">
+                            重点单
+                        </span>
                       )
                     }
 
@@ -213,8 +193,6 @@ export default function CustomerDetail() {
             <div className="w-2 h-2 bg-violet-300 rounded-full"></div>
             <span className="text-sm text-gray-600">已邀约<span className="text-violet-600 font-bold">2月6日下午4点</span>的瑞思demo-p</span>
           </div>
-
-          <PriorityCard />
         </div>
 
         {/* Action Buttons */}
