@@ -1086,6 +1086,11 @@ function TaskCard({ id, name, tags, color = 'red', timeText, timeStatus = 'urgen
                   </div>
               )}
           </div>
+
+          {/* 瑞思英语标签 */}
+          <span className="text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 bg-blue-50 text-blue-500 border border-blue-300 font-medium ml-1">
+            瑞思英语
+          </span>
         </div>
 
         {/* 时钟图标 + 超时提示文字 + 底下的文字 */}
