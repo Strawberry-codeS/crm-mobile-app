@@ -360,6 +360,11 @@ function CustomerItem({ id, name, task, sourceChannel, isKeyDeal, age, stage, ti
               </div>
             )}
           </div>
+
+          {/* 瑞思英语标签 */}
+          <span className="text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 bg-blue-50 text-blue-500 border border-blue-300 font-medium">
+            瑞思英语
+          </span>
         </div>
         <div className="flex flex-col items-end shrink-0 ml-1 relative">
           <div className={`flex items-center text-xs font-medium ${timeColorClass}`}>
